@@ -165,7 +165,7 @@ const avatars = [
       </div>
     </section>
 
-    <div class="mx-auto max-w-6xl px-6 pb-16">
+    <div class="mx-auto max-w-6xl px-6 pb-8">
       <div class="border-t border-neutral-200 pt-8">
         <ul class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 text-sm font-semibold tracking-wide text-neutral-400">
           <li v-for="partner in partners" :key="partner">
