@@ -4,6 +4,7 @@
     <LandingAbout />
     <LandingValues />
     <LandingNumbers />
+    <LandingFaq />
   </div>
 </template>
 
@@ -12,4 +13,5 @@ import LandingHero from './components/LandingHero.vue'
 import LandingAbout from './components/LandingAbout.vue'
 import LandingValues from './components/LandingValues.vue'
 import LandingNumbers from './components/LandingNumbers.vue'
+import LandingFaq from './components/LandingFaq.vue'
 </script>
