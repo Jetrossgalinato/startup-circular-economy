@@ -37,7 +37,7 @@ function toggle(index: number) {
 </script>
 
 <template>
-  <section class="bg-white px-6 pb-24 pt-8 text-foreground">
+  <section class="bg-white px-6 pb-16 pt-8 text-foreground">
     <div class="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
       <header>
         <p class="text-xs font-semibold tracking-[0.22em] text-primary">
