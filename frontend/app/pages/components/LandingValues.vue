@@ -27,28 +27,28 @@ const values = [
 </script>
 
 <template>
-  <section id="how-it-works" class="scroll-mt-24 bg-white px-6 pb-20 text-foreground">
+  <section id="how-it-works" class="scroll-mt-24 bg-white px-6 pb-48 text-foreground">
     <div class="mx-auto max-w-6xl">
-      <header class="grid gap-6 lg:grid-cols-2 lg:items-start lg:gap-16">
+      <header class="grid items-end gap-4 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
         <div>
           <p class="text-xs font-semibold tracking-[0.22em] text-primary">
             VALUES
           </p>
-          <h2 class="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+          <h2 class="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem]">
             Make every device, well-used
           </h2>
         </div>
-        <p class="max-w-md text-base leading-7 text-muted-foreground lg:mt-10 lg:justify-self-end">
+        <p class="max-w-md text-base leading-7 text-muted-foreground">
           E-WISE sits between residents and collectors in Butuan City — with a clear rate card,
           hazard triage, and same-day dispatch instead of informal, untracked e-waste deals.
         </p>
       </header>
 
-      <div class="mt-14 grid gap-5 md:grid-cols-3">
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
         <article
           v-for="value in values"
           :key="value.title"
-          class="flex min-h-[320px] flex-col justify-between p-7 sm:p-8"
+          class="flex flex-col p-6"
           :class="value.accent
             ? 'rounded-tr-[2.75rem] bg-[#ead9c4]'
             : 'rounded-none border border-neutral-200 bg-white'"
@@ -94,17 +94,17 @@ const values = [
               <circle cx="24" cy="31" r="5" />
             </svg>
 
-            <h3 class="mt-8 text-xl font-semibold tracking-tight text-foreground">
+            <h3 class="mt-5 text-xl font-semibold tracking-tight text-foreground">
               {{ value.title }}
             </h3>
-            <p class="mt-3 text-sm leading-6 text-muted-foreground">
+            <p class="mt-2 text-sm leading-6 text-muted-foreground">
               {{ value.body }}
             </p>
           </div>
 
           <a
             :href="value.href"
-            class="mt-10 flex size-10 items-center justify-center rounded-full border"
+            class="mt-6 flex size-10 items-center justify-center rounded-full border"
             :class="value.accent
               ? 'border-foreground bg-foreground text-white'
               : 'border-neutral-200 bg-white text-foreground'"

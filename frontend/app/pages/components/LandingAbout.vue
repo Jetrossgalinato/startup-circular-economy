@@ -9,35 +9,35 @@ const categories = [
 </script>
 
 <template>
-  <section id="company" class="scroll-mt-24 bg-white px-6 pb-20 pt-0 text-foreground">
+  <section id="company" class="scroll-mt-24 bg-white px-6 pb-48 pt-0 text-foreground">
     <div class="mx-auto max-w-6xl">
-      <div class="border-t border-neutral-200 pt-16">
+      <div class="border-t border-neutral-200 pt-20">
         <header class="mx-auto max-w-2xl text-center">
           <p class="text-xs font-semibold tracking-[0.22em] text-primary">
             ABOUT US
           </p>
-          <h2 class="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+          <h2 class="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem]">
             One platform for all your e-waste
           </h2>
-          <p class="mt-4 text-base text-muted-foreground sm:text-lg">
+          <p class="mt-3 text-base text-muted-foreground sm:text-lg">
             Sell, repair, or upcycle without chasing collectors or guessing a price.
           </p>
         </header>
 
-      <div class="mt-14 grid gap-5 lg:grid-cols-[1fr_2fr] lg:gap-6">
-        <article class="flex min-h-[340px] flex-col justify-between rounded-3xl bg-foreground p-7 text-white sm:min-h-[400px] sm:p-8">
+      <div class="mt-10 grid gap-5 lg:grid-cols-[1fr_2fr] lg:gap-5">
+        <article class="flex min-h-[280px] flex-col justify-between rounded-3xl bg-foreground p-6 text-white sm:min-h-[320px] sm:p-7">
           <h3 class="text-xl font-semibold sm:text-2xl">
             Get paid per kilo
           </h3>
 
-          <div class="relative mt-10 flex h-44 items-end justify-between gap-3 px-1 sm:h-52">
+          <div class="relative mt-8 flex h-40 items-end justify-between gap-3 px-1 sm:h-44">
             <span class="w-8 rounded-t-md bg-white/20 sm:w-10" style="height: 38%" />
             <span class="w-8 rounded-t-md bg-white/25 sm:w-10" style="height: 52%" />
             <div class="relative flex w-10 flex-col items-center sm:w-12">
               <span class="absolute -top-8 text-sm font-semibold tracking-tight sm:text-base">
                 ₱12,000
               </span>
-              <svg viewBox="0 0 48 160" class="h-36 w-10 sm:h-44 sm:w-12" aria-hidden="true">
+              <svg viewBox="0 0 48 160" class="h-32 w-10 sm:h-36 sm:w-12" aria-hidden="true">
                 <path
                   d="M24 4 L44 52 H32 V156 H16 V52 H4 Z"
                   fill="white"
@@ -49,7 +49,7 @@ const categories = [
           </div>
         </article>
 
-        <article class="relative min-h-[340px] overflow-hidden rounded-3xl rounded-bl-[4.5rem] bg-[#eef3f0] p-7 sm:min-h-[400px] sm:p-8">
+        <article class="relative min-h-[280px] overflow-hidden rounded-3xl rounded-bl-[4.5rem] bg-[#eef3f0] p-6 sm:min-h-[320px] sm:p-7">
           <h3 class="relative z-10 text-xl font-semibold text-foreground sm:text-2xl">
             Same-day cross-dock
           </h3>
@@ -66,7 +66,7 @@ const categories = [
             </div>
           </div>
 
-          <div class="relative z-10 mt-10 flex min-h-[220px] flex-wrap items-start justify-between gap-4 sm:mt-16">
+          <div class="relative z-10 mt-8 flex min-h-[180px] flex-wrap items-start justify-between gap-4">
             <div class="w-[11.5rem] rounded-2xl bg-white p-3 shadow-sm">
               <div class="mb-3 h-16 overflow-hidden rounded-xl bg-neutral-200">
                 <svg viewBox="0 0 160 80" class="size-full" aria-hidden="true">

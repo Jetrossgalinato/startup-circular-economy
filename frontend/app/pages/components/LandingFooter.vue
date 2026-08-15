@@ -39,42 +39,40 @@ const columns = [
 </script>
 
 <template>
-  <footer class="bg-white px-6 pb-10 pt-6 text-foreground">
+  <footer class="bg-white px-6 pb-10 pt-16 text-foreground">
     <div class="mx-auto max-w-6xl">
-      <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
-        <div class="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-4">
-          <div v-for="column in columns" :key="column.title">
-            <h3 class="text-sm font-semibold">
-              {{ column.title }}
-            </h3>
-            <ul class="mt-4 space-y-3">
-              <li v-for="link in column.links" :key="link.label">
-                <a
-                  :href="link.href"
-                  class="text-sm text-foreground/80 transition-colors hover:text-foreground"
-                >
-                  {{ link.label }}
-                </a>
-              </li>
-            </ul>
-          </div>
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+        <div v-for="column in columns" :key="column.title">
+          <h3 class="text-sm font-semibold">
+            {{ column.title }}
+          </h3>
+          <ul class="mt-3 space-y-2.5">
+            <li v-for="link in column.links" :key="link.label">
+              <a
+                :href="link.href"
+                class="text-sm text-foreground/80 transition-colors hover:text-foreground"
+              >
+                {{ link.label }}
+              </a>
+            </li>
+          </ul>
         </div>
 
-        <div class="lg:max-w-xs lg:text-right">
-          <p class="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+        <div class="sm:text-right">
+          <p class="text-3xl font-semibold tracking-tight text-foreground">
             E-WISE
           </p>
-          <p class="mt-4 text-sm leading-6 text-muted-foreground">
+          <p class="mt-3 text-sm leading-6 text-muted-foreground">
             Butuan City, Agusan del Norte<br>
             Caraga Region, Philippines
           </p>
-          <p class="mt-6 text-sm text-foreground/80">
+          <p class="mt-4 text-sm text-foreground/80">
             English (PH)
           </p>
         </div>
       </div>
 
-      <div class="mt-14 flex flex-col gap-4 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <div class="mt-8 flex flex-col gap-3 border-t border-neutral-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <p class="text-sm text-neutral-400">
           © E-WISE 2026.
         </p>

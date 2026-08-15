@@ -37,13 +37,13 @@ function toggle(index: number) {
 </script>
 
 <template>
-  <section id="faq" class="scroll-mt-24 bg-white px-6 pb-16 pt-8 text-foreground">
-    <div class="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
+  <section id="faq" class="scroll-mt-24 bg-white px-6 pb-48 pt-0 text-foreground">
+    <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_1.6fr] lg:gap-12">
       <header>
         <p class="text-xs font-semibold tracking-[0.22em] text-primary">
           FAQ
         </p>
-        <h2 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+        <h2 class="mt-3 text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.75rem]">
           Frequently asked questions
         </h2>
       </header>
@@ -56,7 +56,7 @@ function toggle(index: number) {
         >
           <button
             type="button"
-            class="flex w-full items-start justify-between gap-6 py-5 text-left"
+            class="flex w-full items-start justify-between gap-6 py-4 text-left"
             :aria-expanded="openIndex === index"
             @click="toggle(index)"
           >
@@ -68,8 +68,8 @@ function toggle(index: number) {
               <Plus v-else class="size-5" />
             </span>
           </button>
-          <div v-show="openIndex === index" class="pb-5 pr-12">
-            <p class="text-sm leading-7 text-muted-foreground sm:text-base">
+          <div v-show="openIndex === index" class="pb-4 pr-12">
+            <p class="text-sm leading-6 text-muted-foreground sm:text-base">
               {{ item.answer }}
             </p>
           </div>

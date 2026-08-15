@@ -19,8 +19,8 @@ const avatars = [
 </script>
 
 <template>
-  <div class="min-h-screen bg-white text-foreground">
-    <header class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-5">
+  <div class="bg-white text-foreground">
+    <header class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-6">
       <a href="/" class="text-xl font-semibold tracking-tight text-foreground">
         E-WISE
       </a>
@@ -51,22 +51,22 @@ const avatars = [
       </div>
     </header>
 
-    <section class="mx-auto grid max-w-6xl items-center gap-12 px-6 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-16">
+    <section class="mx-auto grid max-w-6xl items-center gap-10 px-6 py-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-10">
       <div class="max-w-xl">
         <p class="text-xs font-semibold tracking-[0.22em] text-muted-foreground">
           PILOTING IN BUTUAN CITY
         </p>
-        <h1 class="mt-4 text-4xl font-bold leading-[1.15] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
+        <h1 class="mt-3 text-4xl font-bold leading-[1.2] tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem]">
           Change the way you handle your
           <span class="font-serif font-medium italic">e-waste</span>
         </h1>
-        <p class="mt-6 text-base leading-7 text-muted-foreground sm:text-lg">
+        <p class="mt-5 text-base leading-7 text-muted-foreground sm:text-lg">
           Sell, repair, or upcycle electronics through one city-scale platform. E-WISE buys from
           residents at a clear per-kilo rate, hazard-checks every item, and moves it the same day —
           collectors never contact you directly.
         </p>
 
-        <div class="mt-8 flex flex-wrap items-center gap-6">
+        <div class="mt-7 flex flex-wrap items-center gap-5">
           <Button
             as="a"
             href="#"
@@ -166,7 +166,7 @@ const avatars = [
     </section>
 
     <div class="mx-auto max-w-6xl px-6 pb-8">
-      <div class="border-t border-neutral-200 pt-8">
+      <div class="border-t border-neutral-200 pt-7">
         <ul class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 text-sm font-semibold tracking-wide text-neutral-400">
           <li v-for="partner in partners" :key="partner">
             {{ partner }}
