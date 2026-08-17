@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { Sparkle } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
+import landingCtaBg from '~/assets/images/test.jpg'
 </script>
 
 <template>
-  <section class="bg-white px-6 pb-48">
-    <div class="relative mx-auto max-w-6xl overflow-hidden rounded-2xl bg-foreground px-8 py-12 text-white sm:px-10 lg:pr-72">
+  <section class="bg-white px-6 pb-25">
+    <div
+      class="relative mx-auto max-w-6xl overflow-hidden rounded-2xl bg-cover bg-center px-8 py-12 text-white sm:px-10 lg:pr-72"
+      :style="{ backgroundImage: `url(${landingCtaBg})` }"
+    >
       <div class="pointer-events-none absolute top-7 right-10 hidden gap-2 sm:flex">
         <Sparkle class="size-6 fill-white text-white" />
         <Sparkle class="mt-3 size-4 fill-white text-white" />

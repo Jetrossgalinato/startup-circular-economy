@@ -9,9 +9,9 @@ const categories = [
 </script>
 
 <template>
-  <section id="company" class="scroll-mt-24 bg-white px-6 pb-48 pt-0 text-foreground">
+  <section id="company" class="scroll-mt-24 bg-white px-6 pb-30 pt-0 text-foreground">
     <div class="mx-auto max-w-6xl">
-      <div class="border-t border-neutral-200 pt-20">
+      <div class="pt-20">
         <header class="mx-auto max-w-2xl text-center">
           <p class="text-xs font-semibold tracking-[0.22em] text-primary">
             ABOUT US

@@ -37,12 +37,12 @@ const avatars = [
       </nav>
 
       <div class="flex items-center gap-3">
-        <Button variant="ghost" as="a" href="#login" class="text-sm font-medium text-foreground">
+        <Button variant="ghost" as="a" href="/auth/login" class="text-sm font-medium text-foreground">
           Login
         </Button>
         <Button
           as="a"
-          href="#signup"
+          href="/auth/register"
           class="h-10 rounded-full bg-foreground px-5 text-sm text-white hover:bg-foreground/90"
         >
           Sign Up
