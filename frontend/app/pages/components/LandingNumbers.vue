@@ -1,7 +1,7 @@
 <template>
-  <section class="bg-white px-6 pb-48">
+  <section class="bg-white px-6 pb-25">
     <div
-      class="mx-auto max-w-6xl overflow-hidden rounded-2xl px-8 py-10 text-white sm:px-10 sm:py-11"
+      class="mx-auto max-w-6xl border-b border-neutral-200 overflow-hidden rounded-b-2xl px-8 py-10 text-white sm:px-10 sm:py-11"
       style="background:
         radial-gradient(ellipse 70% 90% at 12% 45%, rgba(255,255,255,0.16), transparent 55%),
         radial-gradient(ellipse 55% 70% at 48% 20%, rgba(255,255,255,0.08), transparent 50%),

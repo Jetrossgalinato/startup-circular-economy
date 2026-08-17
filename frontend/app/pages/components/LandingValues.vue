@@ -27,8 +27,8 @@ const values = [
 </script>
 
 <template>
-  <section id="how-it-works" class="scroll-mt-24 bg-white px-6 pb-48 text-foreground">
-    <div class="mx-auto max-w-6xl">
+  <section id="how-it-works" class="scroll-mt-24 bg-white px-6 pb-20 text-foreground">
+    <div class="mx-auto max-w-6xl border-t border-neutral-200 pt-15">
       <header class="grid items-end gap-4 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
         <div>
           <p class="text-xs font-semibold tracking-[0.22em] text-primary">

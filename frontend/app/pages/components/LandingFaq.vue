@@ -37,8 +37,8 @@ function toggle(index: number) {
 </script>
 
 <template>
-  <section id="faq" class="scroll-mt-24 bg-white px-6 pb-48 pt-0 text-foreground">
-    <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_1.6fr] lg:gap-12">
+  <section id="faq" class="scroll-mt-24 bg-white px-6 pb-30 pt-0 text-foreground">
+    <div class="mx-auto grid max-w-6xl border-t border-neutral-200 pt-15 gap-8 lg:grid-cols-[1fr_1.6fr] lg:gap-12">
       <header>
         <p class="text-xs font-semibold tracking-[0.22em] text-primary">
           FAQ
