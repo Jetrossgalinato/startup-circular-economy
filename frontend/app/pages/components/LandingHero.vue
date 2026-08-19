@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ArrowUpRight, ChevronRight, Globe, Menu, Sparkle, Star, X } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
+import csuLogo from '~/assets/images/csu.png'
+import naviLogo from '~/assets/images/navi.jpg'
 
 const navLinks = [
   { label: 'How it works', href: '#how-it-works' },
@@ -9,7 +11,16 @@ const navLinks = [
   { label: 'Company', href: '#company' },
 ]
 
-const partners = ['Partner 1', 'Partner 2', 'Partner 3', 'Partner 4', 'Partner 5']
+const partners = [
+  {
+    name: 'Caraga State University - Main Campus',
+    src: csuLogo,
+  },
+  {
+    name: 'Navigatu TBI',
+    src: naviLogo,
+  },
+]
 
 const avatars = [
   { initials: 'AM', fill: '#1a3d36' },
@@ -243,9 +254,22 @@ function closeMenu() {
 
     <div class="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
       <div class="border-t border-neutral-200 pt-7">
-        <ul class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm font-semibold tracking-wide text-neutral-400 sm:justify-between">
-          <li v-for="partner in partners" :key="partner">
-            {{ partner }}
+        <ul class="mx-auto grid max-w-lg grid-cols-2 items-start gap-6 sm:gap-10">
+          <li
+            v-for="partner in partners"
+            :key="partner.name"
+            class="flex flex-col items-center text-center"
+          >
+            <div class="flex h-16 w-full items-center justify-center sm:h-20">
+              <img
+                :src="partner.src"
+                :alt="partner.name"
+                class="max-h-full max-w-[7.5rem] object-contain sm:max-w-[9rem]"
+              >
+            </div>
+            <span class="mt-2 min-h-10 text-xs font-medium leading-5 text-neutral-500 sm:min-h-11 sm:text-sm">
+              {{ partner.name }}
+            </span>
           </li>
         </ul>
       </div>
