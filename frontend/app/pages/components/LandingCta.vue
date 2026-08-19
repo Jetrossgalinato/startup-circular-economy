@@ -17,7 +17,7 @@ import landingCtaBg from '~/assets/images/test.jpg'
 
       <div class="relative z-10 max-w-xl">
         <h2 class="text-2xl font-bold leading-snug tracking-tight sm:text-4xl">
-          Change the way you handle your
+          Change the way you handle your <br />
           <span class="font-serif font-medium italic">e-waste</span>
         </h2>
         <p class="mt-4 text-base leading-7 text-white/75 sm:text-lg">

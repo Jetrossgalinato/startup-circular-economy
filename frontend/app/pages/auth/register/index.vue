@@ -1,19 +1,19 @@
 <script setup lang="ts">
-const inputClass = 'h-12 rounded-xl border-neutral-200 bg-white'
+const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
 </script>
 
 <template>
   <AuthShell>
     <form @submit.prevent>
-      <h2 class="text-3xl font-bold tracking-tight text-foreground">
-        Change the way you handle <br /> your
+      <h2 class="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+        Change the way you handle your <br />
         <span class="font-serif font-medium italic">e-waste</span>
       </h2>
-      <p class="mt-2 text-sm leading-6 text-muted-foreground">
+      <p class="mt-1.5 text-sm leading-5 text-muted-foreground sm:mt-2 sm:leading-6">
         Start selling, repairing, and upcycling with E-WISE.
       </p>
 
-      <div class="mt-8 grid gap-5">
+      <div class="mt-5 grid gap-3.5 sm:mt-8 sm:gap-5">
         <div class="flex flex-col gap-1.5">
           <Label for="name">Full name</Label>
           <Input id="name" type="text" placeholder="Ana Mercado" :class="inputClass" />
@@ -32,11 +32,11 @@ const inputClass = 'h-12 rounded-xl border-neutral-200 bg-white'
         </div>
       </div>
 
-      <div class="mt-8 flex flex-col gap-3">
+      <div class="mt-5 flex flex-col gap-2.5 sm:mt-8 sm:gap-3">
         <Button
           type="submit"
           size="lg"
-          class="h-12 w-full rounded-full bg-foreground text-base text-white hover:bg-foreground/90"
+          class="h-10 w-full rounded-full bg-foreground text-sm text-white hover:bg-foreground/90 sm:h-12 sm:text-base"
         >
           Sign Up
         </Button>
@@ -44,13 +44,13 @@ const inputClass = 'h-12 rounded-xl border-neutral-200 bg-white'
           type="button"
           variant="outline"
           size="lg"
-          class="h-12 w-full rounded-full border-neutral-200 text-base"
+          class="h-10 w-full rounded-full border-neutral-200 text-sm sm:h-12 sm:text-base"
         >
           Sign up with Google
         </Button>
       </div>
 
-      <p class="mt-6 text-sm text-muted-foreground">
+      <p class="mt-4 text-sm text-muted-foreground sm:mt-6">
         Already have an account?
         <NuxtLink to="/auth/login" class="font-medium text-foreground underline underline-offset-2">
           Login
