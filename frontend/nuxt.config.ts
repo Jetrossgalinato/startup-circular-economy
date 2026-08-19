@@ -13,6 +13,11 @@ export default defineNuxtConfig({
       extensions: ['.vue'],
       pathPrefix: false,
     },
+    {
+      path: '~/pages/auth/components',
+      extensions: ['.vue'],
+      pathPrefix: false,
+    },
   ],
   vite: {
     plugins: [
