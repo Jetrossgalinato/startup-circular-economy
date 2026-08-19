@@ -27,8 +27,8 @@ const values = [
 </script>
 
 <template>
-  <section id="how-it-works" class="scroll-mt-24 bg-white px-6 pb-20 text-foreground">
-    <div class="mx-auto max-w-6xl border-t border-neutral-200 pt-15">
+  <section id="how-it-works" class="scroll-mt-24 bg-white px-4 pb-16 text-foreground sm:px-6 sm:pb-20">
+    <div class="mx-auto max-w-6xl border-t border-neutral-200 pt-12 sm:pt-15">
       <header class="grid items-end gap-4 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
         <div>
           <p class="text-xs font-semibold tracking-[0.22em] text-primary">
@@ -51,7 +51,7 @@ const values = [
           class="flex flex-col p-6"
           :class="value.accent
             ? 'rounded-tr-[2.75rem] bg-[#ead9c4]'
-            : 'rounded-none border border-neutral-200 bg-white'"
+            : 'rounded-2xl border border-neutral-200 bg-white'"
         >
           <div>
             <svg

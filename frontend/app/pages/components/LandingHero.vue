@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowUpRight, ChevronRight, Globe, Sparkle, Star } from '@lucide/vue'
+import { ArrowUpRight, ChevronRight, Globe, Menu, Sparkle, Star, X } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 
 const navLinks = [
@@ -16,47 +16,83 @@ const avatars = [
   { initials: 'JR', fill: '#2d5c52' },
   { initials: 'KL', fill: '#4a7a6e' },
 ]
+
+const menuOpen = ref(false)
+
+function closeMenu() {
+  menuOpen.value = false
+}
 </script>
 
 <template>
   <div class="bg-white text-foreground">
-    <header class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-6">
-      <a href="/" class="text-xl font-semibold tracking-tight text-foreground">
-        E-WISE
-      </a>
+    <header class="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
+      <div class="flex items-center justify-between gap-2 sm:gap-4">
+        <a href="/" class="text-xl font-semibold tracking-tight text-foreground">
+          E-WISE
+        </a>
 
-      <nav class="hidden items-center gap-8 text-sm font-medium text-foreground/80 md:flex">
+        <nav class="hidden items-center gap-8 text-sm font-medium text-foreground/80 md:flex">
+          <a
+            v-for="link in navLinks"
+            :key="link.href"
+            :href="link.href"
+            class="transition-colors hover:text-foreground"
+          >
+            {{ link.label }}
+          </a>
+        </nav>
+
+        <div class="flex items-center gap-1.5 sm:gap-3">
+          <Button variant="ghost" as="a" href="/auth/login" class="text-sm font-medium text-foreground">
+            Login
+          </Button>
+          <Button
+            as="a"
+            href="/auth/register"
+            class="h-9 rounded-full bg-foreground px-3.5 text-sm text-white hover:bg-foreground/90 sm:h-10 sm:px-5"
+          >
+            Sign Up
+            <ChevronRight class="hidden size-4 sm:block" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            class="md:hidden"
+            :aria-expanded="menuOpen"
+            aria-controls="mobile-nav"
+            :aria-label="menuOpen ? 'Close menu' : 'Open menu'"
+            @click="menuOpen = !menuOpen"
+          >
+            <X v-if="menuOpen" class="size-5" />
+            <Menu v-else class="size-5" />
+          </Button>
+        </div>
+      </div>
+
+      <nav
+        v-show="menuOpen"
+        id="mobile-nav"
+        class="mt-4 flex flex-col gap-1 border-t border-neutral-200 pt-4 md:hidden"
+      >
         <a
           v-for="link in navLinks"
           :key="link.href"
           :href="link.href"
-          class="transition-colors hover:text-foreground"
+          class="rounded-lg px-2 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-neutral-50 hover:text-foreground"
+          @click="closeMenu"
         >
           {{ link.label }}
         </a>
       </nav>
-
-      <div class="flex items-center gap-3">
-        <Button variant="ghost" as="a" href="/auth/login" class="text-sm font-medium text-foreground">
-          Login
-        </Button>
-        <Button
-          as="a"
-          href="/auth/register"
-          class="h-10 rounded-full bg-foreground px-5 text-sm text-white hover:bg-foreground/90"
-        >
-          Sign Up
-          <ChevronRight class="size-4" />
-        </Button>
-      </div>
     </header>
 
-    <section class="mx-auto grid max-w-6xl items-center gap-10 px-6 py-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-10">
+    <section class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-10">
       <div class="max-w-xl">
-        <p class="text-xs font-semibold tracking-[0.22em] text-muted-foreground">
+        <p class="text-xs font-semibold tracking-[0.18em] text-muted-foreground sm:tracking-[0.22em]">
           PILOTING IN BUTUAN CITY
         </p>
-        <h1 class="mt-3 text-4xl font-bold leading-[1.2] tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem]">
+        <h1 class="mt-3 text-[2rem] font-bold leading-[1.2] tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem]">
           Change the way you handle your
           <span class="font-serif font-medium italic">e-waste</span>
         </h1>
@@ -71,7 +107,7 @@ const avatars = [
             as="a"
             href="#"
             size="lg"
-            class="h-12 rounded-full bg-foreground px-7 text-base text-white hover:bg-foreground/90"
+            class="h-12 w-full rounded-full bg-foreground px-7 text-base text-white hover:bg-foreground/90 sm:w-auto"
           >
             Get Started Now
           </Button>
@@ -108,26 +144,26 @@ const avatars = [
           </svg>
         </div>
 
-        <div class="relative flex flex-col justify-between rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-2xl rounded-bl-2xl bg-[#ead9c4] p-5 sm:p-6">
+        <div class="relative flex flex-col justify-between rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-2xl rounded-bl-2xl bg-[#ead9c4] p-3 sm:p-5 lg:p-6">
           <div>
-            <p class="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">7+</p>
+            <p class="text-3xl font-bold tracking-tight text-foreground sm:text-5xl">7+</p>
             <p class="mt-1 text-sm font-medium text-foreground/70">Categories</p>
           </div>
-          <Globe class="absolute right-5 bottom-5 size-10 text-foreground/25 sm:size-12" :stroke-width="1.25" />
+          <Globe class="absolute right-3 bottom-3 size-8 text-foreground/25 sm:right-5 sm:bottom-5 sm:size-12" :stroke-width="1.25" />
         </div>
 
-        <div class="flex flex-col justify-between rounded-tr-[2.5rem] rounded-2xl bg-[#dce8ee] p-5 sm:p-6">
+        <div class="flex flex-col justify-between rounded-tr-[2.5rem] rounded-2xl bg-[#dce8ee] p-3 sm:p-5 lg:p-6">
           <div class="flex gap-1 text-foreground">
             <Sparkle class="size-5 fill-foreground" />
             <Sparkle class="size-4 fill-foreground" />
           </div>
-          <p class="text-lg font-semibold leading-snug text-foreground">Users Active</p>
+          <p class="text-base font-semibold leading-snug text-foreground sm:text-lg">Users Active</p>
           <div class="flex items-center justify-between">
             <div class="flex -space-x-2">
               <span
                 v-for="avatar in avatars"
                 :key="avatar.initials"
-                class="flex size-8 items-center justify-center rounded-full border-2 border-[#dce8ee] text-[10px] font-semibold text-white"
+                class="flex size-7 items-center justify-center rounded-full border-2 border-[#dce8ee] text-[10px] font-semibold text-white sm:size-8"
                 :style="{ backgroundColor: avatar.fill }"
               >
                 {{ avatar.initials }}
@@ -135,7 +171,7 @@ const avatars = [
             </div>
             <a
               href="#"
-              class="flex size-8 items-center justify-center rounded-full bg-foreground text-white"
+              class="flex size-7 items-center justify-center rounded-full bg-foreground text-white sm:size-8"
               aria-label="See active users"
             >
               <ArrowUpRight class="size-4" />
@@ -143,8 +179,8 @@ const avatars = [
           </div>
         </div>
 
-        <div class="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-foreground p-5 text-white sm:p-6">
-          <p class="flex items-center gap-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+        <div class="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-foreground p-3 text-white sm:p-5 lg:p-6">
+          <p class="flex items-center gap-1.5 text-xl font-bold tracking-tight sm:text-3xl">
             2,400 kg
             <svg viewBox="0 0 12 12" class="size-3.5 fill-white" aria-hidden="true">
               <path d="M6 1.5 10.5 7H8v3.5H4V7H1.5L6 1.5Z" />
@@ -165,9 +201,9 @@ const avatars = [
       </div>
     </section>
 
-    <div class="mx-auto max-w-6xl px-6 pb-8">
+    <div class="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
       <div class="border-t border-neutral-200 pt-7">
-        <ul class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 text-sm font-semibold tracking-wide text-neutral-400">
+        <ul class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm font-semibold tracking-wide text-neutral-400 sm:justify-between">
           <li v-for="partner in partners" :key="partner">
             {{ partner }}
           </li>

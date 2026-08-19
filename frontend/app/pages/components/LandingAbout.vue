@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { Globe } from '@lucide/vue'
 
-const categories = [
-  { mark: 'A', label: 'Appliances' },
-  { mark: 'D', label: 'Computing' },
-  { mark: 'E', label: 'Batteries' },
+const bars = [
+  { height: '38%' },
+  { height: '55%' },
+  { height: '72%' },
+  { height: '48%' },
 ]
 </script>
 
 <template>
-  <section id="company" class="scroll-mt-24 bg-white px-6 pb-30 pt-0 text-foreground">
+  <section id="company" class="scroll-mt-24 bg-white px-4 pb-16 pt-0 text-foreground sm:px-6 sm:pb-24 lg:pb-30">
     <div class="mx-auto max-w-6xl">
-      <div class="pt-20">
+      <div class="pt-12 sm:pt-20">
         <header class="mx-auto max-w-2xl text-center">
           <p class="text-xs font-semibold tracking-[0.22em] text-primary">
             ABOUT US
@@ -24,90 +25,63 @@ const categories = [
           </p>
         </header>
 
-      <div class="mt-10 grid gap-5 lg:grid-cols-[1fr_2fr] lg:gap-5">
-        <article class="flex min-h-[280px] flex-col justify-between rounded-3xl bg-foreground p-6 text-white sm:min-h-[320px] sm:p-7">
-          <h3 class="text-xl font-semibold sm:text-2xl">
-            Get paid per kilo
-          </h3>
-
-          <div class="relative mt-8 flex h-40 items-end justify-between gap-3 px-1 sm:h-44">
-            <span class="w-8 rounded-t-md bg-white/20 sm:w-10" style="height: 38%" />
-            <span class="w-8 rounded-t-md bg-white/25 sm:w-10" style="height: 52%" />
-            <div class="relative flex w-10 flex-col items-center sm:w-12">
-              <span class="absolute -top-8 text-sm font-semibold tracking-tight sm:text-base">
-                ₱12,000
-              </span>
-              <svg viewBox="0 0 48 160" class="h-32 w-10 sm:h-36 sm:w-12" aria-hidden="true">
-                <path
-                  d="M24 4 L44 52 H32 V156 H16 V52 H4 Z"
-                  fill="white"
-                />
-              </svg>
-            </div>
-            <span class="w-8 rounded-t-md bg-white/25 sm:w-10" style="height: 64%" />
-            <span class="w-8 rounded-t-md bg-white/20 sm:w-10" style="height: 46%" />
-          </div>
-        </article>
-
-        <article class="relative min-h-[280px] overflow-hidden rounded-3xl rounded-bl-[4.5rem] bg-[#eef3f0] p-6 sm:min-h-[320px] sm:p-7">
-          <h3 class="relative z-10 text-xl font-semibold text-foreground sm:text-2xl">
-            Same-day cross-dock
-          </h3>
-
-          <div class="pointer-events-none absolute inset-0 flex items-end justify-center pb-6">
-            <div class="relative size-56 sm:size-72">
-              <span class="absolute inset-0 rounded-full border border-foreground/10" />
-              <span class="absolute inset-8 rounded-full border border-foreground/10" />
-              <span class="absolute inset-16 rounded-full border border-foreground/10" />
-              <Globe
-                class="absolute inset-0 m-auto size-16 text-foreground/25 sm:size-20"
-                :stroke-width="1.15"
-              />
-            </div>
-          </div>
-
-          <div class="relative z-10 mt-8 flex min-h-[180px] flex-wrap items-start justify-between gap-4">
-            <div class="w-[11.5rem] rounded-2xl bg-white p-3 shadow-sm">
-              <div class="mb-3 h-16 overflow-hidden rounded-xl bg-neutral-200">
-                <svg viewBox="0 0 160 80" class="size-full" aria-hidden="true">
-                  <rect width="160" height="80" fill="#d8dce0" />
-                  <rect x="58" y="10" width="44" height="60" rx="8" fill="#1a1c1e" />
-                  <rect x="62" y="16" width="36" height="48" rx="3" fill="#e8f3ef" />
-                </svg>
-              </div>
-              <p class="text-xl font-bold tracking-tight text-foreground">12.4 kg</p>
-              <p class="text-sm text-muted-foreground">Pickup logged</p>
-              <div class="mt-3 flex -space-x-2">
-                <span class="flex size-7 items-center justify-center rounded-full bg-foreground text-[10px] font-semibold text-white">AM</span>
-                <span class="flex size-7 items-center justify-center rounded-full bg-[#2d5c52] text-[10px] font-semibold text-white">JR</span>
-              </div>
+        <div class="mt-10 grid gap-5 lg:grid-cols-2">
+          <article class="flex flex-col justify-between rounded-3xl bg-foreground p-6 text-white sm:p-8">
+            <div>
+              <h3 class="text-xl font-semibold tracking-tight sm:text-2xl">
+                Get paid per kilo
+              </h3>
+              <p class="mt-2 max-w-sm text-sm leading-6 text-white/70 sm:text-base">
+                A published rate card by device category — the same method local scrap buyers already use, and a price we can defend.
+              </p>
             </div>
 
-            <div class="mt-4 flex flex-col items-end gap-6 sm:mt-0">
-              <div class="relative">
-                <div class="rounded-2xl rounded-bl-sm bg-foreground px-4 py-3 text-white shadow-sm">
-                  <p class="text-lg font-bold tracking-tight">Tier 1</p>
-                  <p class="text-sm text-white/80">Hazard-cleared</p>
-                </div>
-                <span class="absolute -bottom-3 left-4 flex size-8 items-center justify-center rounded-full border-2 border-[#eef3f0] bg-[#4a7a6e] text-[10px] font-semibold text-white">
-                  KL
-                </span>
+            <div class="mt-10 flex items-end justify-between gap-6">
+              <div>
+                <p class="text-4xl font-bold tracking-tight sm:text-5xl">₱12.40</p>
+                <p class="mt-1 text-sm text-white/70">per kilo · appliances</p>
               </div>
 
-              <div class="flex -space-x-2" aria-label="Device categories">
+              <div class="flex h-24 items-end gap-1.5 sm:h-28 sm:gap-2" aria-hidden="true">
                 <span
-                  v-for="category in categories"
-                  :key="category.mark"
-                  class="flex size-9 items-center justify-center rounded-full border-2 border-white bg-foreground text-xs font-semibold text-white"
-                  :title="category.label"
-                >
-                  {{ category.mark }}
-                </span>
+                  v-for="(bar, index) in bars"
+                  :key="index"
+                  class="w-3 rounded-t-sm bg-white/25 sm:w-4"
+                  :class="index === 2 ? 'bg-white/80' : 'bg-white/20'"
+                  :style="{ height: bar.height }"
+                />
               </div>
             </div>
-          </div>
-        </article>
-      </div>
+          </article>
+
+          <article class="relative flex flex-col justify-between overflow-hidden rounded-3xl rounded-bl-[2.5rem] bg-[#eef3f0] p-6 sm:rounded-bl-[4.5rem] sm:p-8">
+            <Globe
+              class="pointer-events-none absolute right-4 bottom-4 size-16 text-foreground/10 sm:right-6 sm:bottom-6 sm:size-24"
+              :stroke-width="1.15"
+              aria-hidden="true"
+            />
+
+            <div class="relative">
+              <h3 class="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+                Same-day cross-dock
+              </h3>
+              <p class="mt-2 max-w-sm text-sm leading-6 text-muted-foreground sm:text-base">
+                Every item is hazard-checked at intake, then moved the same day. Collectors never contact you directly.
+              </p>
+            </div>
+
+            <div class="relative mt-8 grid grid-cols-2 gap-3">
+              <div class="rounded-2xl bg-white p-4">
+                <p class="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">12.4 kg</p>
+                <p class="mt-1 text-sm text-muted-foreground">Pickup logged</p>
+              </div>
+              <div class="rounded-2xl bg-foreground p-4 text-white">
+                <p class="text-2xl font-bold tracking-tight sm:text-3xl">Same day</p>
+                <p class="mt-1 text-sm text-white/75">Hazard-cleared</p>
+              </div>
+            </div>
+          </article>
+        </div>
       </div>
     </div>
   </section>
