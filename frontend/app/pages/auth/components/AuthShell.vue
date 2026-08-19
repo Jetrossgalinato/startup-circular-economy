@@ -3,8 +3,8 @@ import { ChevronRight } from '@lucide/vue'
 </script>
 
 <template>
-  <div class="min-h-screen bg-white text-foreground">
-    <header class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-6">
+  <div class="flex min-h-screen flex-col bg-white text-foreground">
+    <header class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-6">
       <NuxtLink to="/" class="text-xl font-semibold tracking-tight text-foreground">
         E-WISE
       </NuxtLink>
@@ -24,8 +24,10 @@ import { ChevronRight } from '@lucide/vue'
       </div>
     </header>
 
-    <section class="mx-auto flex max-w-6xl justify-center px-6 py-8 lg:py-10">
-      <slot />
+    <section class="flex flex-1 items-center justify-center px-6 py-8 lg:py-10">
+      <div class="w-full max-w-md">
+        <slot />
+      </div>
     </section>
   </div>
 </template>

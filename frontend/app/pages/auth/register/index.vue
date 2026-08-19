@@ -4,9 +4,9 @@ const inputClass = 'h-12 rounded-xl border-neutral-200 bg-white'
 
 <template>
   <AuthShell>
-    <form class="w-full max-w-md" @submit.prevent>
+    <form @submit.prevent>
       <h2 class="text-3xl font-bold tracking-tight text-foreground">
-        Change the way you handle your
+        Change the way you handle <br /> your
         <span class="font-serif font-medium italic">e-waste</span>
       </h2>
       <p class="mt-2 text-sm leading-6 text-muted-foreground">

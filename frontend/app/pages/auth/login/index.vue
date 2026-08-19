@@ -4,7 +4,7 @@ const inputClass = 'h-12 rounded-xl border-neutral-200 bg-white'
 
 <template>
   <AuthShell>
-    <form class="w-full max-w-md" @submit.prevent>
+    <form @submit.prevent>
       <h2 class="text-3xl font-bold tracking-tight text-foreground">
         Sign in to handle your
         <span class="font-serif font-medium italic">e-waste</span>
