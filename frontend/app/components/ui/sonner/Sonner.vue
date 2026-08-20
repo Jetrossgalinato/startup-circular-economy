@@ -18,6 +18,7 @@ defineOptions({
 <template>
   <Sonner
     :class="cn('toaster group', $attrs.class as string)"
+    close-button-position="top-right"
     :style="{
       '--normal-bg': '#ffffff',
       '--normal-text': 'var(--foreground)',
@@ -60,6 +61,14 @@ defineOptions({
 <style>
 [data-sonner-toast][data-styled='true'] {
   overflow: hidden;
+}
+
+[data-sonner-toast][data-styled='true'] [data-close-button] {
+  top: 8px;
+  right: 8px;
+  left: unset;
+  bottom: unset;
+  transform: none;
 }
 
 [data-sonner-toast][data-styled='true']::after {
