@@ -5,9 +5,9 @@ import landingCtaBg from '~/assets/images/test.jpg'
 </script>
 
 <template>
-  <section class="bg-white px-6 pb-25">
+  <section class="bg-white px-4 pb-16 sm:px-6 sm:pb-24 lg:pb-25">
     <div
-      class="relative mx-auto max-w-6xl overflow-hidden rounded-2xl bg-cover bg-center px-8 py-12 text-white sm:px-10 lg:pr-72"
+      class="relative mx-auto max-w-6xl overflow-hidden rounded-2xl bg-cover bg-center px-5 py-10 text-white sm:px-10 sm:py-12 lg:pr-72"
       :style="{ backgroundImage: `url(${landingCtaBg})` }"
     >
       <div class="pointer-events-none absolute top-7 right-10 hidden gap-2 sm:flex">
@@ -16,8 +16,8 @@ import landingCtaBg from '~/assets/images/test.jpg'
       </div>
 
       <div class="relative z-10 max-w-xl">
-        <h2 class="text-3xl font-bold leading-snug tracking-tight sm:text-4xl">
-          Change the way you handle your
+        <h2 class="text-2xl font-bold leading-snug tracking-tight sm:text-4xl">
+          Change the way you handle your <br />
           <span class="font-serif font-medium italic">e-waste</span>
         </h2>
         <p class="mt-4 text-base leading-7 text-white/75 sm:text-lg">
@@ -28,7 +28,7 @@ import landingCtaBg from '~/assets/images/test.jpg'
           as="a"
           href="#"
           size="lg"
-          class="mt-6 h-12 rounded-full bg-white px-7 text-base text-foreground hover:bg-white/90"
+          class="mt-6 h-12 w-full rounded-full bg-white px-7 text-base text-foreground hover:bg-white/90 sm:w-auto"
         >
           Get Started Now
         </Button>
