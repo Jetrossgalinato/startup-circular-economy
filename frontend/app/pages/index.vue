@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white">
+  <div class="overflow-x-hidden bg-white">
     <LandingHero />
     <LandingAbout />
     <LandingValues />

@@ -1,62 +1,39 @@
 <script setup lang="ts">
-import { ArrowUpRight, ChevronRight, Globe, Sparkle, Star } from '@lucide/vue'
+import { ArrowUpRight, Globe, Sparkle, Star } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
+import csuLogo from '~/assets/images/csu.png'
+import naviLogo from '~/assets/images/navi.jpg'
 
-const navLinks = [
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Sell e-waste', href: '#sell-e-waste' },
-  { label: 'Repair', href: '#repair' },
-  { label: 'Company', href: '#company' },
+const partners = [
+  {
+    name: 'Caraga State University - Main Campus',
+    src: csuLogo,
+  },
+  {
+    name: 'Navigatu TBI',
+    src: naviLogo,
+  },
 ]
-
-const partners = ['Partner 1', 'Partner 2', 'Partner 3', 'Partner 4', 'Partner 5']
 
 const avatars = [
   { initials: 'AM', fill: '#1a3d36' },
   { initials: 'JR', fill: '#2d5c52' },
   { initials: 'KL', fill: '#4a7a6e' },
 ]
+
+const categories = ['Appliances', 'Computing', 'Batteries']
 </script>
 
 <template>
   <div class="bg-white text-foreground">
-    <header class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-6">
-      <a href="/" class="text-xl font-semibold tracking-tight text-foreground">
-        E-WISE
-      </a>
+    <AppNavbar />
 
-      <nav class="hidden items-center gap-8 text-sm font-medium text-foreground/80 md:flex">
-        <a
-          v-for="link in navLinks"
-          :key="link.href"
-          :href="link.href"
-          class="transition-colors hover:text-foreground"
-        >
-          {{ link.label }}
-        </a>
-      </nav>
-
-      <div class="flex items-center gap-3">
-        <Button variant="ghost" as="a" href="/auth/login" class="text-sm font-medium text-foreground">
-          Login
-        </Button>
-        <Button
-          as="a"
-          href="/auth/register"
-          class="h-10 rounded-full bg-foreground px-5 text-sm text-white hover:bg-foreground/90"
-        >
-          Sign Up
-          <ChevronRight class="size-4" />
-        </Button>
-      </div>
-    </header>
-
-    <section class="mx-auto grid max-w-6xl items-center gap-10 px-6 py-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-10">
+    <section class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-10">
       <div class="max-w-xl">
-        <p class="text-xs font-semibold tracking-[0.22em] text-muted-foreground">
+        <p class="text-xs font-semibold tracking-[0.18em] text-muted-foreground sm:tracking-[0.22em]">
           PILOTING IN BUTUAN CITY
         </p>
-        <h1 class="mt-3 text-4xl font-bold leading-[1.2] tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem]">
+        <h1 class="mt-3 text-[2rem] font-bold leading-[1.2] tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem]">
           Change the way you handle your
           <span class="font-serif font-medium italic">e-waste</span>
         </h1>
@@ -71,7 +48,7 @@ const avatars = [
             as="a"
             href="#"
             size="lg"
-            class="h-12 rounded-full bg-foreground px-7 text-base text-white hover:bg-foreground/90"
+            class="h-12 w-full rounded-full bg-foreground px-7 text-base text-white hover:bg-foreground/90 sm:w-auto"
           >
             Get Started Now
           </Button>
@@ -93,8 +70,8 @@ const avatars = [
         </div>
       </div>
 
-      <div class="grid aspect-square grid-cols-2 grid-rows-2 gap-3 sm:gap-4">
-        <div class="overflow-hidden rounded-[1.75rem] bg-neutral-200">
+      <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:aspect-square lg:grid-rows-2">
+        <div class="relative min-h-[10.5rem] overflow-hidden rounded-[1.75rem] bg-neutral-200 sm:min-h-0">
           <svg viewBox="0 0 320 320" class="size-full" aria-hidden="true">
             <rect width="320" height="320" fill="#d8dce0" />
             <ellipse cx="160" cy="280" rx="90" ry="18" fill="#c5c9cd" />
@@ -106,28 +83,56 @@ const avatars = [
             <rect x="144" y="162" width="32" height="6" rx="3" fill="#c5d8d1" />
             <rect x="132" y="188" width="56" height="22" rx="11" fill="#1a3d36" />
           </svg>
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/85 to-transparent px-3 pb-3 pt-10 sm:px-4 sm:pb-4">
+            <p class="text-sm font-semibold text-white">Pickup logged</p>
+            <p class="text-xs text-white/75">12.4 kg · today</p>
+          </div>
         </div>
 
-        <div class="relative flex flex-col justify-between rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-2xl rounded-bl-2xl bg-[#ead9c4] p-5 sm:p-6">
-          <div>
-            <p class="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">7+</p>
-            <p class="mt-1 text-sm font-medium text-foreground/70">Categories</p>
+        <div class="relative flex min-h-[10.5rem] flex-col justify-between overflow-hidden rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-2xl rounded-bl-2xl bg-[#ead9c4] p-3 sm:min-h-0 sm:p-5 lg:p-6">
+          <Globe
+            class="pointer-events-none absolute -right-2 -bottom-2 size-16 text-foreground/10 sm:size-20"
+            :stroke-width="1.15"
+            aria-hidden="true"
+          />
+          <div class="relative">
+            <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50 sm:text-xs">
+              RATE CARD
+            </p>
+            <p class="mt-1 text-3xl font-bold tracking-tight text-foreground sm:text-5xl">7+</p>
+            <p class="mt-0.5 text-sm font-medium text-foreground/70">Device categories</p>
           </div>
-          <Globe class="absolute right-5 bottom-5 size-10 text-foreground/25 sm:size-12" :stroke-width="1.25" />
+          <div class="relative mt-3 flex flex-wrap gap-1">
+            <span
+              v-for="category in categories"
+              :key="category"
+              class="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-medium text-foreground sm:text-xs"
+            >
+              {{ category }}
+            </span>
+          </div>
         </div>
 
-        <div class="flex flex-col justify-between rounded-tr-[2.5rem] rounded-2xl bg-[#dce8ee] p-5 sm:p-6">
-          <div class="flex gap-1 text-foreground">
-            <Sparkle class="size-5 fill-foreground" />
-            <Sparkle class="size-4 fill-foreground" />
+        <div class="flex min-h-[10.5rem] flex-col justify-between rounded-tr-[2.5rem] rounded-2xl bg-[#dce8ee] p-3 sm:min-h-0 sm:p-5 lg:p-6">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex gap-1 text-foreground">
+              <Sparkle class="size-5 fill-foreground" />
+              <Sparkle class="size-4 fill-foreground" />
+            </div>
+            <span class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50 sm:text-xs">
+              THIS WEEK
+            </span>
           </div>
-          <p class="text-lg font-semibold leading-snug text-foreground">Users Active</p>
-          <div class="flex items-center justify-between">
+          <div class="mt-3">
+            <p class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">40+</p>
+            <p class="mt-0.5 text-sm font-medium text-foreground/70 sm:text-base">Residents active</p>
+          </div>
+          <div class="mt-3 flex items-center justify-between">
             <div class="flex -space-x-2">
               <span
                 v-for="avatar in avatars"
                 :key="avatar.initials"
-                class="flex size-8 items-center justify-center rounded-full border-2 border-[#dce8ee] text-[10px] font-semibold text-white"
+                class="flex size-7 items-center justify-center rounded-full border-2 border-[#dce8ee] text-[10px] font-semibold text-white sm:size-8"
                 :style="{ backgroundColor: avatar.fill }"
               >
                 {{ avatar.initials }}
@@ -135,22 +140,32 @@ const avatars = [
             </div>
             <a
               href="#"
-              class="flex size-8 items-center justify-center rounded-full bg-foreground text-white"
-              aria-label="See active users"
+              class="flex size-7 items-center justify-center rounded-full bg-foreground text-white sm:size-8"
+              aria-label="See active residents"
             >
               <ArrowUpRight class="size-4" />
             </a>
           </div>
         </div>
 
-        <div class="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-foreground p-5 text-white sm:p-6">
-          <p class="flex items-center gap-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
-            2,400 kg
-            <svg viewBox="0 0 12 12" class="size-3.5 fill-white" aria-hidden="true">
-              <path d="M6 1.5 10.5 7H8v3.5H4V7H1.5L6 1.5Z" />
-            </svg>
-          </p>
-          <svg viewBox="0 0 200 64" class="w-full" aria-hidden="true">
+        <div class="relative flex min-h-[10.5rem] flex-col justify-between overflow-hidden rounded-2xl bg-foreground p-3 text-white sm:min-h-0 sm:p-5 lg:p-6">
+          <div>
+            <p class="text-[10px] font-semibold tracking-[0.16em] text-white/55 sm:text-xs">
+              THIS MONTH
+            </p>
+            <p class="mt-1 flex items-center gap-1.5 text-xl font-bold tracking-tight sm:text-3xl">
+              2,400 kg
+              <svg viewBox="0 0 12 12" class="size-3.5 fill-white" aria-hidden="true">
+                <path d="M6 1.5 10.5 7H8v3.5H4V7H1.5L6 1.5Z" />
+              </svg>
+            </p>
+          </div>
+          <svg viewBox="0 0 200 72" class="mt-2 w-full" aria-hidden="true">
+            <path
+              d="M0 48 L28 42 L52 50 L80 28 L108 34 L136 16 L164 22 L200 8 V72 H0 Z"
+              fill="white"
+              opacity="0.12"
+            />
             <path
               d="M0 48 L28 42 L52 50 L80 28 L108 34 L136 16 L164 22 L200 8"
               fill="none"
@@ -160,16 +175,29 @@ const avatars = [
               stroke-linecap="round"
             />
           </svg>
-          <p class="self-end text-sm text-white/80">Recovered</p>
+          <p class="text-sm text-white/80">Recovered · same-day dock</p>
         </div>
       </div>
     </section>
 
-    <div class="mx-auto max-w-6xl px-6 pb-8">
+    <div class="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
       <div class="border-t border-neutral-200 pt-7">
-        <ul class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 text-sm font-semibold tracking-wide text-neutral-400">
-          <li v-for="partner in partners" :key="partner">
-            {{ partner }}
+        <ul class="mx-auto grid max-w-lg grid-cols-2 items-start gap-6 sm:gap-10">
+          <li
+            v-for="partner in partners"
+            :key="partner.name"
+            class="flex flex-col items-center text-center"
+          >
+            <div class="flex h-16 w-full items-center justify-center sm:h-20">
+              <img
+                :src="partner.src"
+                :alt="partner.name"
+                class="max-h-full max-w-[7.5rem] object-contain sm:max-w-[9rem]"
+              >
+            </div>
+            <span class="mt-2 min-h-10 text-xs font-medium leading-5 text-neutral-500 sm:min-h-11 sm:text-sm">
+              {{ partner.name }}
+            </span>
           </li>
         </ul>
       </div>

@@ -37,8 +37,8 @@ function toggle(index: number) {
 </script>
 
 <template>
-  <section id="faq" class="scroll-mt-24 bg-white px-6 pb-30 pt-0 text-foreground">
-    <div class="mx-auto grid max-w-6xl border-t border-neutral-200 pt-15 gap-8 lg:grid-cols-[1fr_1.6fr] lg:gap-12">
+  <section id="faq" class="scroll-mt-24 bg-white px-4 pb-16 pt-0 text-foreground sm:px-6 sm:pb-24 lg:pb-30">
+    <div class="mx-auto grid max-w-6xl gap-8 border-t border-neutral-200 pt-12 sm:pt-15 lg:grid-cols-[1fr_1.6fr] lg:gap-12">
       <header>
         <p class="text-xs font-semibold tracking-[0.22em] text-primary">
           FAQ
@@ -56,7 +56,7 @@ function toggle(index: number) {
         >
           <button
             type="button"
-            class="flex w-full items-start justify-between gap-6 py-4 text-left"
+            class="flex min-h-11 w-full items-start justify-between gap-4 py-4 text-left sm:gap-6"
             :aria-expanded="openIndex === index"
             @click="toggle(index)"
           >
@@ -68,7 +68,7 @@ function toggle(index: number) {
               <Plus v-else class="size-5" />
             </span>
           </button>
-          <div v-show="openIndex === index" class="pb-4 pr-12">
+          <div v-show="openIndex === index" class="pb-4 pr-10 sm:pr-12">
             <p class="text-sm leading-6 text-muted-foreground sm:text-base">
               {{ item.answer }}
             </p>
