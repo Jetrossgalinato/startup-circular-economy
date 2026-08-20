@@ -26,7 +26,7 @@ defineOptions({
     }"
     :toast-options="{
       classes: {
-        toast: 'group toast !bg-white !text-foreground !border-border shadow-lg',
+        toast: 'group toast !bg-white !text-foreground !border-border shadow-lg overflow-hidden',
         title: 'text-sm font-semibold text-foreground',
         description: 'text-sm text-muted-foreground',
         closeButton: '!bg-white !border-border !text-foreground',
@@ -56,3 +56,49 @@ defineOptions({
     </template>
   </Sonner>
 </template>
+
+<style>
+[data-sonner-toast][data-styled='true'] {
+  overflow: hidden;
+}
+
+[data-sonner-toast][data-styled='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  transform-origin: left;
+  animation: sonner-progress 4000ms linear forwards;
+}
+
+[data-sonner-toast][data-type='success']::after {
+  background: rgb(5 150 105);
+}
+
+[data-sonner-toast][data-type='error']::after {
+  background: rgb(220 38 38);
+}
+
+[data-sonner-toast][data-type='info']::after {
+  background: rgb(2 132 199);
+}
+
+[data-sonner-toast][data-type='warning']::after {
+  background: rgb(217 119 6);
+}
+
+[data-sonner-toast][data-expanded='true']::after {
+  animation-play-state: paused;
+}
+
+@keyframes sonner-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+</style>
