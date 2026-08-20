@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
+const selectTriggerClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
 
 const roles = [
   { value: 'resident', label: 'Resident' },
@@ -7,7 +8,7 @@ const roles = [
   { value: 'collector', label: 'Collector' },
 ]
 
-const role = ref('')
+const role = ref<string>()
 </script>
 
 <template>
@@ -32,19 +33,20 @@ const role = ref('')
         </div>
         <div class="flex flex-col gap-1.5">
           <Label for="role">Role</Label>
-          <select
-            id="role"
-            v-model="role"
-            required
-            :class="[inputClass, 'w-full px-3 text-sm text-foreground']"
-          >
-            <option value="" disabled>
-              Select your role
-            </option>
-            <option v-for="option in roles" :key="option.value" :value="option.value">
-              {{ option.label }}
-            </option>
-          </select>
+          <Select v-model="role" required>
+            <SelectTrigger id="role" :class="selectTriggerClass">
+              <SelectValue placeholder="Select your role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem
+                v-for="option in roles"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div class="flex flex-col gap-1.5">
           <Label for="password">Password</Label>
