@@ -1,4 +1,4 @@
-import type { RoleOption } from '@/types/auth'
+import type { RoleOption, UserRole } from '@/types/auth'
 
 export const AUTH_STATE_KEYS = {
   user: 'auth-user',
@@ -18,6 +18,16 @@ export const REGISTER_ROLES: RoleOption[] = [
   { value: 'admin', label: 'Admin' },
   { value: 'collector', label: 'Collector' },
 ]
+
+export const ROLE_HOME_ROUTES: Record<UserRole, string> = {
+  admin: '/admin',
+  resident: '/resident',
+  collector: '/collector',
+}
+
+export const LOGOUT_REDIRECT_PATH = '/auth/login'
+
+export const LOGIN_PATH = '/auth/login'
 
 export const AUTH_MESSAGES = {
   register: {

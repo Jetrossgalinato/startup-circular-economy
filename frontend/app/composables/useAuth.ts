@@ -1,7 +1,7 @@
 import type { Session, User } from '@supabase/supabase-js'
 import { AUTH_STATE_KEYS } from '@/constants/auth'
 import type { Profile, SignInInput, SignUpInput } from '@/types/auth'
-import { mapAuthError } from '@/utils/auth'
+import { getRoleHomeRoute, mapAuthError } from '@/utils/auth'
 
 export function useAuth() {
   const supabase = useSupabase()
@@ -105,6 +105,16 @@ export function useAuth() {
     await setSession(null)
   }
 
+  async function redirectToRoleHome() {
+    const role = profile.value?.role
+
+    if (!role) {
+      throw new Error('Profile role is not available')
+    }
+
+    await navigateTo(getRoleHomeRoute(role))
+  }
+
   return {
     user,
     session,
@@ -114,5 +124,6 @@ export function useAuth() {
     signUp,
     signIn,
     signOut,
+    redirectToRoleHome,
   }
 }

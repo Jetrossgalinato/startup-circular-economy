@@ -12,7 +12,7 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const { signUp } = useAuth()
+const { signUp, redirectToRoleHome } = useAuth()
 
 const fullName = ref('')
 const email = ref('')
@@ -51,7 +51,7 @@ async function handleSubmit() {
     })
 
     if (data.session) {
-      await navigateTo('/')
+      await redirectToRoleHome()
       return
     }
 
@@ -74,7 +74,7 @@ async function handleSubmit() {
         <span class="font-serif font-medium italic">e-waste</span>
       </h2>
       <p class="mt-1.5 text-sm leading-5 text-muted-foreground sm:mt-2 sm:leading-6">
-        Join the MVP B2C sell flow — list e-waste, get a per-kilo rate, and move items through E-WISE cross-dock intake.
+        Join the community and start handling your e-waste <br /> with E-WISE.
       </p>
 
       <p

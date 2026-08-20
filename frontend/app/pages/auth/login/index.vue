@@ -6,7 +6,7 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const { signIn } = useAuth()
+const { signIn, redirectToRoleHome } = useAuth()
 
 const email = ref('')
 const password = ref('')
@@ -34,7 +34,7 @@ async function handleSubmit() {
       password: password.value,
     })
 
-    await navigateTo('/')
+    await redirectToRoleHome()
   } catch (error) {
     errorMessage.value = error instanceof Error
       ? error.message
