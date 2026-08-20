@@ -11,12 +11,16 @@ async function handleLogout() {
 
   try {
     await signOut()
-    toast.success(AUTH_MESSAGES.logout.success)
+    toast.success(AUTH_MESSAGES.logout.successTitle, {
+      description: AUTH_MESSAGES.logout.success,
+    })
     await navigateTo(LOGOUT_REDIRECT_PATH)
   } catch (error) {
-    toast.error(error instanceof Error
-      ? error.message
-      : AUTH_MESSAGES.logout.genericError)
+    toast.error(AUTH_MESSAGES.logout.errorTitle, {
+      description: error instanceof Error
+        ? error.message
+        : AUTH_MESSAGES.logout.genericError,
+    })
   } finally {
     loading.value = false
   }

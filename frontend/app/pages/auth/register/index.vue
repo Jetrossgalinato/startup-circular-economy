@@ -32,7 +32,9 @@ async function handleSubmit() {
   })
 
   if (validationError) {
-    toast.error(validationError)
+    toast.error(AUTH_MESSAGES.register.validationTitle, {
+      description: validationError,
+    })
     return
   }
 
@@ -47,16 +49,22 @@ async function handleSubmit() {
     })
 
     if (data.session) {
-      toast.success(AUTH_MESSAGES.register.success)
+      toast.success(AUTH_MESSAGES.register.successTitle, {
+        description: AUTH_MESSAGES.register.success,
+      })
       await redirectToRoleHome()
       return
     }
 
-    toast.success(AUTH_MESSAGES.register.successEmailConfirmation)
+    toast.success(AUTH_MESSAGES.register.successEmailConfirmationTitle, {
+      description: AUTH_MESSAGES.register.successEmailConfirmation,
+    })
   } catch (error) {
-    toast.error(error instanceof Error
-      ? error.message
-      : AUTH_MESSAGES.register.genericError)
+    toast.error(AUTH_MESSAGES.register.errorTitle, {
+      description: error instanceof Error
+        ? error.message
+        : AUTH_MESSAGES.register.genericError,
+    })
   } finally {
     loading.value = false
   }

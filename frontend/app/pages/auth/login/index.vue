@@ -20,7 +20,9 @@ async function handleSubmit() {
   })
 
   if (validationError) {
-    toast.error(validationError)
+    toast.error(AUTH_MESSAGES.login.validationTitle, {
+      description: validationError,
+    })
     return
   }
 
@@ -32,12 +34,16 @@ async function handleSubmit() {
       password: password.value,
     })
 
-    toast.success(AUTH_MESSAGES.login.success)
+    toast.success(AUTH_MESSAGES.login.successTitle, {
+      description: AUTH_MESSAGES.login.success,
+    })
     await redirectToRoleHome()
   } catch (error) {
-    toast.error(error instanceof Error
-      ? error.message
-      : AUTH_MESSAGES.login.genericError)
+    toast.error(AUTH_MESSAGES.login.errorTitle, {
+      description: error instanceof Error
+        ? error.message
+        : AUTH_MESSAGES.login.genericError,
+    })
   } finally {
     loading.value = false
   }
