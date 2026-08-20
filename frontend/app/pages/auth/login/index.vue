@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { AUTH_INPUT_CLASS, AUTH_MESSAGES } from '@/constants/auth'
+import { validateLoginForm } from '@/utils/auth'
+
 definePageMeta({
   middleware: 'auth',
 })
-
-const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
 
 const { signIn } = useAuth()
 
@@ -15,8 +16,13 @@ const errorMessage = ref('')
 async function handleSubmit() {
   errorMessage.value = ''
 
-  if (!email.value.trim() || !password.value) {
-    errorMessage.value = 'Email and password are required.'
+  const validationError = validateLoginForm({
+    email: email.value,
+    password: password.value,
+  })
+
+  if (validationError) {
+    errorMessage.value = validationError
     return
   }
 
@@ -30,7 +36,9 @@ async function handleSubmit() {
 
     await navigateTo('/')
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Unable to sign in.'
+    errorMessage.value = error instanceof Error
+      ? error.message
+      : AUTH_MESSAGES.login.genericError
   } finally {
     loading.value = false
   }
@@ -58,7 +66,7 @@ async function handleSubmit() {
       <div class="mt-5 grid gap-3.5 sm:mt-8 sm:gap-5">
         <div class="flex flex-col gap-1.5">
           <Label for="email">Email</Label>
-          <Input id="email" v-model="email" type="email" placeholder="m@example.com" :class="inputClass" />
+          <Input id="email" v-model="email" type="email" placeholder="m@example.com" :class="AUTH_INPUT_CLASS" />
         </div>
         <div class="flex flex-col gap-1.5">
           <div class="flex items-center">
@@ -70,7 +78,7 @@ async function handleSubmit() {
               Forgot your password?
             </a>
           </div>
-          <PasswordInput id="password" v-model="password" :input-class="inputClass" />
+          <PasswordInput id="password" v-model="password" :input-class="AUTH_INPUT_CLASS" />
         </div>
       </div>
 
@@ -81,7 +89,7 @@ async function handleSubmit() {
           :disabled="loading"
           class="h-10 w-full rounded-full bg-foreground text-sm text-white hover:bg-foreground/90 sm:h-12 sm:text-base"
         >
-          {{ loading ? 'Signing in...' : 'Login' }}
+          {{ loading ? AUTH_MESSAGES.login.submitting : AUTH_MESSAGES.login.submit }}
         </Button>
         <Button
           type="button"

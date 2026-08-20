@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import type { UserRole } from '~/composables/useAuth'
+import {
+  AUTH_INPUT_CLASS,
+  AUTH_MESSAGES,
+  AUTH_SELECT_TRIGGER_CLASS,
+  REGISTER_ROLES,
+} from '@/constants/auth'
+import type { UserRole } from '@/types/auth'
+import { validateRegisterForm } from '@/utils/auth'
 
 definePageMeta({
   middleware: 'auth',
 })
-
-const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
-const selectTriggerClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
-
-const roles: { value: UserRole, label: string }[] = [
-  { value: 'resident', label: 'Resident' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'collector', label: 'Collector' },
-]
 
 const { signUp } = useAuth()
 
@@ -25,35 +23,18 @@ const loading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
-function validateForm() {
-  if (!fullName.value.trim()) {
-    return 'Full name is required.'
-  }
-
-  if (!email.value.trim()) {
-    return 'Email is required.'
-  }
-
-  if (!role.value) {
-    return 'Select a role to continue.'
-  }
-
-  if (password.value.length < 6) {
-    return 'Password must be at least 6 characters.'
-  }
-
-  if (password.value !== confirmPassword.value) {
-    return 'Passwords do not match.'
-  }
-
-  return null
-}
-
 async function handleSubmit() {
   errorMessage.value = ''
   successMessage.value = ''
 
-  const validationError = validateForm()
+  const validationError = validateRegisterForm({
+    fullName: fullName.value,
+    email: email.value,
+    password: password.value,
+    confirmPassword: confirmPassword.value,
+    role: role.value,
+  })
+
   if (validationError) {
     errorMessage.value = validationError
     return
@@ -74,9 +55,11 @@ async function handleSubmit() {
       return
     }
 
-    successMessage.value = 'Check your email to confirm your account, then sign in.'
+    successMessage.value = AUTH_MESSAGES.register.successEmailConfirmation
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Unable to create account.'
+    errorMessage.value = error instanceof Error
+      ? error.message
+      : AUTH_MESSAGES.register.genericError
   } finally {
     loading.value = false
   }
@@ -111,21 +94,21 @@ async function handleSubmit() {
       <div class="mt-5 grid gap-3.5 sm:mt-8 sm:gap-5">
         <div class="flex flex-col gap-1.5">
           <Label for="name">Full name</Label>
-          <Input id="name" v-model="fullName" type="text" placeholder="Ana Mercado" :class="inputClass" />
+          <Input id="name" v-model="fullName" type="text" placeholder="Ana Mercado" :class="AUTH_INPUT_CLASS" />
         </div>
         <div class="flex flex-col gap-1.5">
           <Label for="email">Email</Label>
-          <Input id="email" v-model="email" type="email" placeholder="m@example.com" :class="inputClass" />
+          <Input id="email" v-model="email" type="email" placeholder="m@example.com" :class="AUTH_INPUT_CLASS" />
         </div>
         <div class="flex flex-col gap-1.5">
           <Label for="role">Role</Label>
           <Select v-model="role" required>
-            <SelectTrigger id="role" :class="selectTriggerClass">
+            <SelectTrigger id="role" :class="AUTH_SELECT_TRIGGER_CLASS">
               <SelectValue placeholder="Select your role" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem
-                v-for="option in roles"
+                v-for="option in REGISTER_ROLES"
                 :key="option.value"
                 :value="option.value"
               >
@@ -136,11 +119,11 @@ async function handleSubmit() {
         </div>
         <div class="flex flex-col gap-1.5">
           <Label for="password">Password</Label>
-          <PasswordInput id="password" v-model="password" :input-class="inputClass" />
+          <PasswordInput id="password" v-model="password" :input-class="AUTH_INPUT_CLASS" />
         </div>
         <div class="flex flex-col gap-1.5">
           <Label for="confirm-password">Confirm password</Label>
-          <PasswordInput id="confirm-password" v-model="confirmPassword" :input-class="inputClass" />
+          <PasswordInput id="confirm-password" v-model="confirmPassword" :input-class="AUTH_INPUT_CLASS" />
         </div>
       </div>
 
@@ -151,7 +134,7 @@ async function handleSubmit() {
           :disabled="loading"
           class="h-10 w-full rounded-full bg-foreground text-sm text-white hover:bg-foreground/90 sm:h-12 sm:text-base"
         >
-          {{ loading ? 'Creating account...' : 'Sign Up' }}
+          {{ loading ? AUTH_MESSAGES.register.submitting : AUTH_MESSAGES.register.submit }}
         </Button>
         <Button
           type="button"

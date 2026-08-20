@@ -1,54 +1,14 @@
 import type { Session, User } from '@supabase/supabase-js'
-
-export type UserRole = 'resident' | 'admin' | 'collector'
-
-export type Profile = {
-  id: string
-  full_name: string
-  role: UserRole
-  created_at: string
-}
-
-type SignUpInput = {
-  email: string
-  password: string
-  fullName: string
-  role: UserRole
-}
-
-type SignInInput = {
-  email: string
-  password: string
-}
-
-function mapAuthError(message: string): string {
-  const normalized = message.toLowerCase()
-
-  if (normalized.includes('invalid login credentials')) {
-    return 'Incorrect email or password.'
-  }
-
-  if (normalized.includes('user already registered')) {
-    return 'An account with this email already exists.'
-  }
-
-  if (normalized.includes('password should be at least')) {
-    return 'Password must be at least 6 characters.'
-  }
-
-  if (normalized.includes('unable to validate email address')) {
-    return 'Enter a valid email address.'
-  }
-
-  return message
-}
+import { AUTH_STATE_KEYS } from '@/constants/auth'
+import type { Profile, SignInInput, SignUpInput } from '@/types/auth'
+import { mapAuthError } from '@/utils/auth'
 
 export function useAuth() {
   const supabase = useSupabase()
-  const user = useState<User | null>('auth-user', () => null)
-  const session = useState<Session | null>('auth-session', () => null)
-  const profile = useState<Profile | null>('auth-profile', () => null)
-  const initialized = useState('auth-initialized', () => false)
+  const user = useState<User | null>(AUTH_STATE_KEYS.user, () => null)
+  const session = useState<Session | null>(AUTH_STATE_KEYS.session, () => null)
+  const profile = useState<Profile | null>(AUTH_STATE_KEYS.profile, () => null)
+  const initialized = useState<boolean>(AUTH_STATE_KEYS.initialized, () => false)
 
   async function fetchProfile(currentUser: User | null = user.value) {
     if (!currentUser) {
