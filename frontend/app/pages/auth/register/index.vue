@@ -50,11 +50,11 @@ const role = ref<string>()
         </div>
         <div class="flex flex-col gap-1.5">
           <Label for="password">Password</Label>
-          <Input id="password" type="password" :class="inputClass" />
+          <PasswordInput id="password" :input-class="inputClass" />
         </div>
         <div class="flex flex-col gap-1.5">
           <Label for="confirm-password">Confirm password</Label>
-          <Input id="confirm-password" type="password" :class="inputClass" />
+          <PasswordInput id="confirm-password" :input-class="inputClass" />
         </div>
       </div>
 

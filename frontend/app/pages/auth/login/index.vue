@@ -28,7 +28,7 @@ const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
               Forgot your password?
             </a>
           </div>
-          <Input id="password" type="password" :class="inputClass" />
+          <PasswordInput id="password" :input-class="inputClass" />
         </div>
       </div>
 
