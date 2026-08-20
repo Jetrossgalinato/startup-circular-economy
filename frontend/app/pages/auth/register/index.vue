@@ -1,5 +1,13 @@
 <script setup lang="ts">
 const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
+
+const roles = [
+  { value: 'resident', label: 'Resident' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'collector', label: 'Collector' },
+]
+
+const role = ref('')
 </script>
 
 <template>
@@ -10,7 +18,7 @@ const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
         <span class="font-serif font-medium italic">e-waste</span>
       </h2>
       <p class="mt-1.5 text-sm leading-5 text-muted-foreground sm:mt-2 sm:leading-6">
-        Start selling, repairing, and upcycling with E-WISE.
+        Join the MVP B2C sell flow — list e-waste, get a per-kilo rate, and move items through E-WISE cross-dock intake.
       </p>
 
       <div class="mt-5 grid gap-3.5 sm:mt-8 sm:gap-5">
@@ -21,6 +29,22 @@ const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
         <div class="flex flex-col gap-1.5">
           <Label for="email">Email</Label>
           <Input id="email" type="email" placeholder="m@example.com" :class="inputClass" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <Label for="role">Role</Label>
+          <select
+            id="role"
+            v-model="role"
+            required
+            :class="[inputClass, 'w-full px-3 text-sm text-foreground']"
+          >
+            <option value="" disabled>
+              Select your role
+            </option>
+            <option v-for="option in roles" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </option>
+          </select>
         </div>
         <div class="flex flex-col gap-1.5">
           <Label for="password">Password</Label>
