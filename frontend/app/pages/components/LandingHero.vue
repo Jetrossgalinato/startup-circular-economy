@@ -3,6 +3,7 @@ import { ArrowUpRight, ChevronRight, Globe, Menu, Sparkle, Star, X } from '@luci
 import { Button } from '@/components/ui/button'
 import csuLogo from '~/assets/images/csu.png'
 import naviLogo from '~/assets/images/navi.jpg'
+import ewiseLogo from '~/assets/images/looogo.png'
 
 const navLinks = [
   { label: 'How it works', href: '#how-it-works' },
@@ -41,8 +42,16 @@ function closeMenu() {
   <div class="bg-white text-foreground">
     <header class="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
       <div class="flex items-center justify-between gap-2 sm:gap-4">
-        <a href="/" class="text-xl font-semibold tracking-tight text-foreground">
-          E-WISE
+        <a
+          href="/"
+          class="flex shrink-0 items-center"
+          aria-label="E-WISE home"
+        >
+          <img
+            :src="ewiseLogo"
+            alt="E-WISE"
+            class="h-14 w-auto object-contain sm:h-16"
+          >
         </a>
 
         <nav class="hidden items-center gap-8 text-sm font-medium text-foreground/80 md:flex">
