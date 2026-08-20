@@ -1,10 +1,45 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth',
+})
+
 const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
+
+const { signIn } = useAuth()
+
+const email = ref('')
+const password = ref('')
+const loading = ref(false)
+const errorMessage = ref('')
+
+async function handleSubmit() {
+  errorMessage.value = ''
+
+  if (!email.value.trim() || !password.value) {
+    errorMessage.value = 'Email and password are required.'
+    return
+  }
+
+  loading.value = true
+
+  try {
+    await signIn({
+      email: email.value.trim(),
+      password: password.value,
+    })
+
+    await navigateTo('/')
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : 'Unable to sign in.'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
   <AuthShell>
-    <form @submit.prevent>
+    <form @submit.prevent="handleSubmit">
       <h2 class="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
         Sign in to handle your
         <span class="font-serif font-medium italic">e-waste</span>
@@ -13,10 +48,17 @@ const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
         Enter your email and password to continue.
       </p>
 
+      <p
+        v-if="errorMessage"
+        class="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+      >
+        {{ errorMessage }}
+      </p>
+
       <div class="mt-5 grid gap-3.5 sm:mt-8 sm:gap-5">
         <div class="flex flex-col gap-1.5">
           <Label for="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" :class="inputClass" />
+          <Input id="email" v-model="email" type="email" placeholder="m@example.com" :class="inputClass" />
         </div>
         <div class="flex flex-col gap-1.5">
           <div class="flex items-center">
@@ -28,7 +70,7 @@ const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
               Forgot your password?
             </a>
           </div>
-          <PasswordInput id="password" :input-class="inputClass" />
+          <PasswordInput id="password" v-model="password" :input-class="inputClass" />
         </div>
       </div>
 
@@ -36,14 +78,16 @@ const inputClass = 'h-10 rounded-xl border-neutral-200 bg-white sm:h-12'
         <Button
           type="submit"
           size="lg"
+          :disabled="loading"
           class="h-10 w-full rounded-full bg-foreground text-sm text-white hover:bg-foreground/90 sm:h-12 sm:text-base"
         >
-          Login
+          {{ loading ? 'Signing in...' : 'Login' }}
         </Button>
         <Button
           type="button"
           variant="outline"
           size="lg"
+          disabled
           class="h-10 w-full rounded-full border-neutral-200 text-sm sm:h-12 sm:text-base"
         >
           Login with Google

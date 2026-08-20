@@ -19,7 +19,13 @@ export default defineNuxtPlugin(() => {
     }
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  })
 
   return {
     provide: {

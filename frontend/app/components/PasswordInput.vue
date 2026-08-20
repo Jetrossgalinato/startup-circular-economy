@@ -1,11 +1,21 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
 import { Eye, EyeOff } from '@lucide/vue'
+import { useVModel } from '@vueuse/core'
 
-defineProps<{
+const props = defineProps<{
   id: string
+  modelValue?: string
   inputClass?: HTMLAttributes['class']
 }>()
+
+const emits = defineEmits<{
+  (e: 'update:modelValue', payload: string): void
+}>()
+
+const modelValue = useVModel(props, 'modelValue', emits, {
+  passive: true,
+})
 
 const showPassword = ref(false)
 </script>
@@ -14,6 +24,7 @@ const showPassword = ref(false)
   <div class="relative">
     <Input
       :id="id"
+      v-model="modelValue"
       :type="showPassword ? 'text' : 'password'"
       :class="[inputClass, 'pr-10']"
     />
