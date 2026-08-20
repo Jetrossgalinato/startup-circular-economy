@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
 import { AUTH_INPUT_CLASS, AUTH_MESSAGES } from '@/constants/auth'
 import { validateLoginForm } from '@/utils/auth'
 
@@ -11,18 +12,15 @@ const { signIn, redirectToRoleHome } = useAuth()
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
-const errorMessage = ref('')
 
 async function handleSubmit() {
-  errorMessage.value = ''
-
   const validationError = validateLoginForm({
     email: email.value,
     password: password.value,
   })
 
   if (validationError) {
-    errorMessage.value = validationError
+    toast.error(validationError)
     return
   }
 
@@ -34,11 +32,12 @@ async function handleSubmit() {
       password: password.value,
     })
 
+    toast.success(AUTH_MESSAGES.login.success)
     await redirectToRoleHome()
   } catch (error) {
-    errorMessage.value = error instanceof Error
+    toast.error(error instanceof Error
       ? error.message
-      : AUTH_MESSAGES.login.genericError
+      : AUTH_MESSAGES.login.genericError)
   } finally {
     loading.value = false
   }
@@ -54,13 +53,6 @@ async function handleSubmit() {
       </h2>
       <p class="mt-1.5 text-sm leading-5 text-muted-foreground sm:mt-2 sm:leading-6">
         Enter your email and password to continue.
-      </p>
-
-      <p
-        v-if="errorMessage"
-        class="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
-      >
-        {{ errorMessage }}
       </p>
 
       <div class="mt-5 grid gap-3.5 sm:mt-8 sm:gap-5">

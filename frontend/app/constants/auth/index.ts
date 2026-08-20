@@ -37,6 +37,7 @@ export const AUTH_MESSAGES = {
     passwordMinLength: 'Password must be at least 6 characters.',
     passwordMismatch: 'Passwords do not match.',
     successEmailConfirmation: 'Check your email to confirm your account, then sign in.',
+    success: 'Account created successfully.',
     genericError: 'Unable to create account.',
     submitting: 'Creating account...',
     submit: 'Sign Up',
@@ -44,7 +45,12 @@ export const AUTH_MESSAGES = {
   login: {
     credentialsRequired: 'Email and password are required.',
     genericError: 'Unable to sign in.',
+    success: 'Signed in successfully.',
     submitting: 'Signing in...',
     submit: 'Login',
+  },
+  logout: {
+    success: 'Logged out successfully.',
+    genericError: 'Unable to log out.',
   },
 } as const

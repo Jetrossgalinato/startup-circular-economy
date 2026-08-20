@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
 import {
   AUTH_INPUT_CLASS,
   AUTH_MESSAGES,
@@ -20,13 +21,8 @@ const password = ref('')
 const confirmPassword = ref('')
 const role = ref<UserRole>()
 const loading = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
 
 async function handleSubmit() {
-  errorMessage.value = ''
-  successMessage.value = ''
-
   const validationError = validateRegisterForm({
     fullName: fullName.value,
     email: email.value,
@@ -36,7 +32,7 @@ async function handleSubmit() {
   })
 
   if (validationError) {
-    errorMessage.value = validationError
+    toast.error(validationError)
     return
   }
 
@@ -51,15 +47,16 @@ async function handleSubmit() {
     })
 
     if (data.session) {
+      toast.success(AUTH_MESSAGES.register.success)
       await redirectToRoleHome()
       return
     }
 
-    successMessage.value = AUTH_MESSAGES.register.successEmailConfirmation
+    toast.success(AUTH_MESSAGES.register.successEmailConfirmation)
   } catch (error) {
-    errorMessage.value = error instanceof Error
+    toast.error(error instanceof Error
       ? error.message
-      : AUTH_MESSAGES.register.genericError
+      : AUTH_MESSAGES.register.genericError)
   } finally {
     loading.value = false
   }
@@ -75,20 +72,6 @@ async function handleSubmit() {
       </h2>
       <p class="mt-1.5 text-sm leading-5 text-muted-foreground sm:mt-2 sm:leading-6">
         Join the community and start handling your e-waste <br /> with E-WISE.
-      </p>
-
-      <p
-        v-if="errorMessage"
-        class="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
-      >
-        {{ errorMessage }}
-      </p>
-
-      <p
-        v-if="successMessage"
-        class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
-      >
-        {{ successMessage }}
       </p>
 
       <div class="mt-5 grid gap-3.5 sm:mt-8 sm:gap-5">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { LOGOUT_REDIRECT_PATH } from '@/constants/auth'
+import { toast } from 'vue-sonner'
+import { AUTH_MESSAGES, LOGOUT_REDIRECT_PATH } from '@/constants/auth'
 
 const { signOut } = useAuth()
 
@@ -10,7 +11,12 @@ async function handleLogout() {
 
   try {
     await signOut()
+    toast.success(AUTH_MESSAGES.logout.success)
     await navigateTo(LOGOUT_REDIRECT_PATH)
+  } catch (error) {
+    toast.error(error instanceof Error
+      ? error.message
+      : AUTH_MESSAGES.logout.genericError)
   } finally {
     loading.value = false
   }
