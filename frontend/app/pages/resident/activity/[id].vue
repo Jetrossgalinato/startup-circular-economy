@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Listing } from '@/types/listings'
+import { canCancelListing } from '@/types/listings'
 import { toast } from 'vue-sonner'
 
 definePageMeta({
@@ -9,9 +10,10 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { fetchListing } = useListings()
+const { fetchListing, cancelListing } = useListings()
 const listing = ref<Listing | null>(null)
 const loading = ref(true)
+const cancelling = ref(false)
 
 onMounted(async () => {
   try {
@@ -28,6 +30,34 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+async function handleCancel() {
+  if (!listing.value || !canCancelListing(listing.value.status) || cancelling.value) {
+    return
+  }
+
+  const confirmed = window.confirm(
+    'Cancel this listing? Logistics will not pick it up.',
+  )
+  if (!confirmed) {
+    return
+  }
+
+  cancelling.value = true
+  try {
+    await cancelListing(listing.value.id)
+    toast.success('Listing cancelled', {
+      description: 'It has been removed from your active activity.',
+    })
+    await navigateTo('/resident/activity')
+  } catch (error) {
+    toast.error('Could not cancel listing', {
+      description: error instanceof Error ? error.message : 'Try again.',
+    })
+  } finally {
+    cancelling.value = false
+  }
+}
 </script>
 
 <template>
@@ -46,6 +76,8 @@ onMounted(async () => {
       v-else-if="listing"
       class="mt-4"
       :listing="listing"
+      :cancelling="cancelling"
+      @cancel="handleCancel"
     />
   </div>
 </template>

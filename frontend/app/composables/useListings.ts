@@ -140,6 +140,22 @@ export function useListings() {
   }
 
   async function cancelListing(id: string): Promise<Listing> {
+    const current = await fetchListing(id)
+    if (!current) {
+      throw new Error('Listing not found.')
+    }
+
+    const cancellable = [
+      'draft',
+      'triaging',
+      'awaiting_acceptance',
+      'accepted',
+      'pickup_scheduled',
+    ]
+    if (!cancellable.includes(current.status)) {
+      throw new Error('This listing can no longer be cancelled.')
+    }
+
     return updateListing(id, { status: 'cancelled' })
   }
 

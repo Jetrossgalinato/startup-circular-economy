@@ -109,3 +109,17 @@ export const LISTING_STATUS_LABELS: Record<ListingStatus, string> = {
   refused: 'Intake refused',
   cancelled: 'Cancelled',
 }
+
+/** Residents can cancel before logistics weigh-in or payout. */
+export const CANCELLABLE_LISTING_STATUSES: ListingStatus[] = [
+  'draft',
+  'triaging',
+  'awaiting_acceptance',
+  'accepted',
+  'pickup_scheduled',
+]
+
+export function canCancelListing(status: ListingStatus): boolean {
+  return CANCELLABLE_LISTING_STATUSES.includes(status)
+}
+
