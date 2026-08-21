@@ -6,10 +6,6 @@ on:
       - main
       - development
 
-defaults:
-  run:
-    working-directory: frontend
-
 jobs:
   deploy:
     name: Deploy to Vercel
@@ -23,7 +19,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Verify Vercel secrets
-        working-directory: .
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
@@ -52,7 +47,6 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install Vercel CLI
-        working-directory: .
         run: npm install -g vercel@latest
 
       - name: Link Vercel project
