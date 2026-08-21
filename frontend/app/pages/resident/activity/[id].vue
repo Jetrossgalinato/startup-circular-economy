@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Listing } from '@/types/listings'
+import { canCancelListing } from '@/types/listings'
 import { toast } from 'vue-sonner'
 
 definePageMeta({
@@ -9,25 +10,59 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { fetchListing } = useListings()
-const listing = ref<Listing | null>(null)
-const loading = ref(true)
+const listingId = computed(() => String(route.params.id))
+const { fetchListing, cancelListing, peekListing } = useListings()
+const listing = ref<Listing | null>(peekListing(listingId.value))
+const loading = ref(listing.value == null)
+const dialogOpen = ref(false)
+const submitting = ref(false)
 
 onMounted(async () => {
   try {
-    listing.value = await fetchListing(String(route.params.id))
+    listing.value = await fetchListing(listingId.value)
     if (!listing.value) {
-      toast.error('Listing not found')
+      toast.error('Listing not found', {
+        description: 'It may have been cancelled or removed.',
+      })
       await navigateTo('/resident/activity')
     }
   } catch (error) {
     toast.error('Could not load listing', {
-      description: error instanceof Error ? error.message : undefined,
+      description: error instanceof Error ? error.message : 'Try again later.',
     })
   } finally {
     loading.value = false
   }
 })
+
+function openCancelDialog() {
+  if (!listing.value || !canCancelListing(listing.value.status) || submitting.value) {
+    return
+  }
+  dialogOpen.value = true
+}
+
+async function confirmCancel(reason: string) {
+  if (!listing.value || submitting.value) {
+    return
+  }
+
+  submitting.value = true
+  try {
+    await cancelListing(listing.value.id, reason)
+    toast.success('Listing cancelled', {
+      description: 'It has been removed from your active activity.',
+    })
+    dialogOpen.value = false
+    await navigateTo('/resident/activity')
+  } catch (error) {
+    toast.error('Could not cancel listing', {
+      description: error instanceof Error ? error.message : 'Try again.',
+    })
+  } finally {
+    submitting.value = false
+  }
+}
 </script>
 
 <template>
@@ -46,6 +81,14 @@ onMounted(async () => {
       v-else-if="listing"
       class="mt-4"
       :listing="listing"
+      :cancelling="submitting"
+      @cancel="openCancelDialog"
+    />
+
+    <CancelListingDialog
+      v-model:open="dialogOpen"
+      :submitting="submitting"
+      @confirm="confirmCancel"
     />
   </div>
 </template>

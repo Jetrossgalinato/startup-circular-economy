@@ -63,6 +63,7 @@ export function useAuth() {
     if (nextSession?.user) {
       await fetchProfile(nextSession.user)
     } else {
+      useResidentCache().invalidateAll()
       profile.value = null
     }
   }
