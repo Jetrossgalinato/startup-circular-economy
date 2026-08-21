@@ -18,9 +18,35 @@ export function useAuth() {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, role, created_at')
+      .select('id, full_name, role, created_at, phone, address, default_gcash_number, default_payout_method')
       .eq('id', currentUser.id)
       .maybeSingle()
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    profile.value = data
+    return data
+  }
+
+  async function updateProfile(patch: {
+    full_name?: string
+    phone?: string | null
+    address?: string | null
+    default_gcash_number?: string | null
+    default_payout_method?: 'gcash' | 'cash' | null
+  }) {
+    if (!user.value) {
+      throw new Error('You must be signed in to update your profile.')
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(patch)
+      .eq('id', user.value.id)
+      .select('id, full_name, role, created_at, phone, address, default_gcash_number, default_payout_method')
+      .single()
 
     if (error) {
       throw new Error(error.message)
@@ -121,6 +147,7 @@ export function useAuth() {
     profile,
     initAuth,
     fetchProfile,
+    updateProfile,
     signUp,
     signIn,
     signOut,

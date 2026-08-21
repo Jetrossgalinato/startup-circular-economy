@@ -1,10 +1,16 @@
 export type UserRole = 'resident' | 'admin' | 'collector'
 
+export type PayoutMethodPreference = 'gcash' | 'cash'
+
 export type Profile = {
   id: string
   full_name: string
   role: UserRole
   created_at: string
+  phone?: string | null
+  address?: string | null
+  default_gcash_number?: string | null
+  default_payout_method?: PayoutMethodPreference | null
 }
 
 export type SignUpInput = {
