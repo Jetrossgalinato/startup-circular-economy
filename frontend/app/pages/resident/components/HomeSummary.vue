@@ -12,10 +12,7 @@ defineProps<{
 <template>
   <div class="space-y-6">
     <div>
-      <p class="text-xs font-semibold tracking-[0.18em] text-muted-foreground">
-        E-WISE RESIDENT
-      </p>
-      <h1 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">
         Hello,
         <span class="font-serif font-medium italic">{{ name.split(' ')[0] || 'there' }}</span>
       </h1>
