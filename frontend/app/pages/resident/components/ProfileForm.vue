@@ -24,7 +24,32 @@ watch(profile, (next) => {
   defaultPayout.value = next.default_payout_method ?? null
 })
 
+const isDirty = computed(() => {
+  const saved = profile.value
+  if (!saved) {
+    return true
+  }
+
+  const nextPhone = phone.value.trim() || null
+  const nextAddress = address.value.trim() || null
+  const nextGcash = defaultGcash.value.trim() || null
+
+  return (
+    fullName.value.trim() !== saved.full_name
+    || nextPhone !== (saved.phone || null)
+    || nextAddress !== (saved.address || null)
+    || nextGcash !== (saved.default_gcash_number || null)
+    || defaultPayout.value !== (saved.default_payout_method ?? null)
+  )
+})
+
+const canSave = computed(() => isDirty.value && !saving.value)
+
 async function save() {
+  if (!canSave.value) {
+    return
+  }
+
   if (!fullName.value.trim()) {
     toast.error('Check your details', {
       description: 'Full name is required.',
@@ -134,8 +159,8 @@ async function handleLogout() {
     <Button
       type="submit"
       size="lg"
-      :disabled="saving"
-      class="h-11 w-full rounded-full bg-foreground text-white hover:bg-foreground/90"
+      :disabled="!canSave"
+      class="h-11 w-full rounded-full bg-foreground text-white hover:bg-foreground/90 disabled:opacity-50"
     >
       {{ saving ? 'Saving…' : 'Save profile' }}
     </Button>
