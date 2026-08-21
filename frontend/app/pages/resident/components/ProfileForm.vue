@@ -26,7 +26,9 @@ watch(profile, (next) => {
 
 async function save() {
   if (!fullName.value.trim()) {
-    toast.error('Full name is required')
+    toast.error('Check your details', {
+      description: 'Full name is required.',
+    })
     return
   }
 
@@ -39,7 +41,9 @@ async function save() {
       default_gcash_number: defaultGcash.value.trim() || null,
       default_payout_method: defaultPayout.value,
     })
-    toast.success('Profile updated')
+    toast.success('Profile updated', {
+      description: 'Your contact and payout preferences were saved.',
+    })
   } catch (error) {
     toast.error('Could not save profile', {
       description: error instanceof Error ? error.message : 'Try again.',

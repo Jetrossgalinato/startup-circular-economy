@@ -20,12 +20,14 @@ onMounted(async () => {
   try {
     listing.value = await fetchListing(String(route.params.id))
     if (!listing.value) {
-      toast.error('Listing not found')
+      toast.error('Listing not found', {
+        description: 'It may have been cancelled or removed.',
+      })
       await navigateTo('/resident/activity')
     }
   } catch (error) {
     toast.error('Could not load listing', {
-      description: error instanceof Error ? error.message : undefined,
+      description: error instanceof Error ? error.message : 'Try again later.',
     })
   } finally {
     loading.value = false

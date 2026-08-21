@@ -190,7 +190,9 @@ async function runTriage() {
 
 async function goNext() {
   if (!canContinue() && step.value !== 'triage') {
-    toast.error('Complete this step to continue')
+    toast.error('Incomplete step', {
+      description: 'Complete this step to continue.',
+    })
     return
   }
 
