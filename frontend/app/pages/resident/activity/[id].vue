@@ -10,15 +10,16 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { fetchListing, cancelListing } = useListings()
-const listing = ref<Listing | null>(null)
-const loading = ref(true)
+const listingId = computed(() => String(route.params.id))
+const { fetchListing, cancelListing, peekListing } = useListings()
+const listing = ref<Listing | null>(peekListing(listingId.value))
+const loading = ref(listing.value == null)
 const dialogOpen = ref(false)
 const submitting = ref(false)
 
 onMounted(async () => {
   try {
-    listing.value = await fetchListing(String(route.params.id))
+    listing.value = await fetchListing(listingId.value)
     if (!listing.value) {
       toast.error('Listing not found', {
         description: 'It may have been cancelled or removed.',

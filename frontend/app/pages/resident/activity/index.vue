@@ -7,16 +7,22 @@ definePageMeta({
   role: 'resident',
 })
 
-const { fetchMyListings } = useListings()
-const listings = ref<Listing[]>([])
-const loading = ref(true)
+const { fetchMyListings, peekListings } = useListings()
+const listings = ref<Listing[]>(peekListings() ?? [])
+const loading = ref(listings.value.length === 0 && peekListings() === null)
 
-async function loadListings() {
-  loading.value = true
+async function loadListings(force = false) {
+  const hadCache = peekListings() !== null
+  if (!hadCache) {
+    loading.value = true
+  }
+
   try {
-    listings.value = await fetchMyListings()
+    listings.value = await fetchMyListings({ force })
   } catch {
-    listings.value = []
+    if (!hadCache) {
+      listings.value = []
+    }
   } finally {
     loading.value = false
   }
@@ -26,7 +32,7 @@ function onCancelled(id: string) {
   listings.value = listings.value.filter((listing) => listing.id !== id)
 }
 
-onMounted(loadListings)
+onMounted(() => loadListings())
 </script>
 
 <template>
