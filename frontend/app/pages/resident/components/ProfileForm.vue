@@ -24,9 +24,36 @@ watch(profile, (next) => {
   defaultPayout.value = next.default_payout_method ?? null
 })
 
+const isDirty = computed(() => {
+  const saved = profile.value
+  if (!saved) {
+    return true
+  }
+
+  const nextPhone = phone.value.trim() || null
+  const nextAddress = address.value.trim() || null
+  const nextGcash = defaultGcash.value.trim() || null
+
+  return (
+    fullName.value.trim() !== saved.full_name
+    || nextPhone !== (saved.phone || null)
+    || nextAddress !== (saved.address || null)
+    || nextGcash !== (saved.default_gcash_number || null)
+    || defaultPayout.value !== (saved.default_payout_method ?? null)
+  )
+})
+
+const canSave = computed(() => isDirty.value && !saving.value)
+
 async function save() {
+  if (!canSave.value) {
+    return
+  }
+
   if (!fullName.value.trim()) {
-    toast.error('Full name is required')
+    toast.error('Check your details', {
+      description: 'Full name is required.',
+    })
     return
   }
 
@@ -39,7 +66,9 @@ async function save() {
       default_gcash_number: defaultGcash.value.trim() || null,
       default_payout_method: defaultPayout.value,
     })
-    toast.success('Profile updated')
+    toast.success('Profile updated', {
+      description: 'Your contact and payout preferences were saved.',
+    })
   } catch (error) {
     toast.error('Could not save profile', {
       description: error instanceof Error ? error.message : 'Try again.',
@@ -130,8 +159,8 @@ async function handleLogout() {
     <Button
       type="submit"
       size="lg"
-      :disabled="saving"
-      class="h-11 w-full rounded-full bg-foreground text-white hover:bg-foreground/90"
+      :disabled="!canSave"
+      class="h-11 w-full rounded-full bg-foreground text-white hover:bg-foreground/90 disabled:opacity-50"
     >
       {{ saving ? 'Saving…' : 'Save profile' }}
     </Button>

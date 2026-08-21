@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { Listing } from '@/types/listings'
-import type { RateCardCategory } from '@/types/listings'
+import type { Listing, RateCardCategory } from '@/types/listings'
 
 definePageMeta({
   layout: 'resident',
@@ -9,12 +8,12 @@ definePageMeta({
 })
 
 const { profile } = useAuth()
-const { fetchMyListings } = useListings()
-const { fetchCategories } = useRateCard()
+const { fetchMyListings, peekListings } = useListings()
+const { fetchCategories, peekCategories } = useRateCard()
 
-const listings = ref<Listing[]>([])
-const categories = ref<RateCardCategory[]>([])
-const loading = ref(true)
+const listings = ref<Listing[]>(peekListings() ?? [])
+const categories = ref<RateCardCategory[]>(peekCategories() ?? [])
+const loading = ref(listings.value.length === 0 && categories.value.length === 0)
 
 const activeCount = computed(() =>
   listings.value.filter((l) =>
@@ -33,7 +32,7 @@ onMounted(async () => {
     listings.value = nextListings
     categories.value = nextCategories
   } catch {
-    // Pages still render with empty state
+    // Keep any peeked cache on failure
   } finally {
     loading.value = false
   }

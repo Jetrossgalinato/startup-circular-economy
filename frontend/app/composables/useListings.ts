@@ -7,6 +7,11 @@ import {
   type ListingStatus,
   type PayoutMethod,
 } from '@/types/listings'
+import {
+  RESIDENT_CACHE_KEYS,
+  RESIDENT_CACHE_TTL_MS,
+  type ResidentCacheFetchOptions,
+} from '@/constants/resident/cache'
 
 function normalizeListing(row: Record<string, unknown>): Listing {
   const condition = {
@@ -31,6 +36,8 @@ function normalizeListing(row: Record<string, unknown>): Listing {
     weight_kg: row.weight_kg != null ? Number(row.weight_kg) : null,
     quoted_rate_per_kg: row.quoted_rate_per_kg != null ? Number(row.quoted_rate_per_kg) : null,
     final_amount: row.final_amount != null ? Number(row.final_amount) : null,
+    cancellation_reason: (row.cancellation_reason as string | null) ?? null,
+    cancelled_at: (row.cancelled_at as string | null) ?? null,
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
     listing_photos: (row.listing_photos as Listing['listing_photos']) ?? [],
@@ -55,6 +62,8 @@ const LISTING_SELECT = `
   weight_kg,
   quoted_rate_per_kg,
   final_amount,
+  cancellation_reason,
+  cancelled_at,
   created_at,
   updated_at,
   listing_photos ( id, listing_id, storage_path, sort_order, created_at ),
@@ -64,6 +73,43 @@ const LISTING_SELECT = `
 export function useListings() {
   const supabase = useSupabase()
   const { user } = useAuth()
+  const cache = useResidentCache()
+
+  function upsertListingCaches(listings: Listing[]) {
+    for (const listing of listings) {
+      cache.setCached(RESIDENT_CACHE_KEYS.listing(listing.id), listing)
+    }
+  }
+
+  function patchListingsCache(updater: (current: Listing[]) => Listing[]) {
+    const existing = cache.getCached<Listing[]>(RESIDENT_CACHE_KEYS.listings)
+    const next = updater(existing?.data ?? [])
+    cache.setCached(RESIDENT_CACHE_KEYS.listings, next)
+    upsertListingCaches(next.filter((listing) => listing.status !== 'cancelled'))
+  }
+
+  function removeListingFromCache(id: string) {
+    patchListingsCache((current) => current.filter((listing) => listing.id !== id))
+    cache.invalidate(RESIDENT_CACHE_KEYS.listing(id))
+  }
+
+  function writeListingThrough(listing: Listing) {
+    cache.setCached(RESIDENT_CACHE_KEYS.listing(listing.id), listing)
+
+    if (listing.status === 'cancelled') {
+      patchListingsCache((current) => current.filter((item) => item.id !== listing.id))
+      return listing
+    }
+
+    patchListingsCache((current) => {
+      const without = current.filter((item) => item.id !== listing.id)
+      return [listing, ...without].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      )
+    })
+
+    return listing
+  }
 
   async function createListing(input: CreateListingInput = {}): Promise<Listing> {
     if (!user.value) {
@@ -85,10 +131,10 @@ export function useListings() {
       throw new Error(error.message)
     }
 
-    return normalizeListing(data)
+    return writeListingThrough(normalizeListing(data))
   }
 
-  async function fetchMyListings(): Promise<Listing[]> {
+  async function fetchMyListingsFromNetwork(): Promise<Listing[]> {
     if (!user.value) {
       return []
     }
@@ -104,10 +150,23 @@ export function useListings() {
       throw new Error(error.message)
     }
 
-    return (data ?? []).map((row) => normalizeListing(row))
+    const listings = (data ?? []).map((row) => normalizeListing(row))
+    upsertListingCaches(listings)
+    return listings
   }
 
-  async function fetchListing(id: string): Promise<Listing | null> {
+  async function fetchMyListings(
+    options: ResidentCacheFetchOptions = {},
+  ): Promise<Listing[]> {
+    return cache.swr(
+      RESIDENT_CACHE_KEYS.listings,
+      RESIDENT_CACHE_TTL_MS.listings,
+      fetchMyListingsFromNetwork,
+      options,
+    )
+  }
+
+  async function fetchListingFromNetwork(id: string): Promise<Listing | null> {
     const { data, error } = await supabase
       .from('listings')
       .select(LISTING_SELECT)
@@ -118,7 +177,27 @@ export function useListings() {
       throw new Error(error.message)
     }
 
-    return data ? normalizeListing(data) : null
+    if (!data) {
+      return null
+    }
+
+    const listing = normalizeListing(data)
+    if (listing.status !== 'cancelled') {
+      cache.setCached(RESIDENT_CACHE_KEYS.listing(id), listing)
+    }
+    return listing
+  }
+
+  async function fetchListing(
+    id: string,
+    options: ResidentCacheFetchOptions = {},
+  ): Promise<Listing | null> {
+    return cache.swr(
+      RESIDENT_CACHE_KEYS.listing(id),
+      RESIDENT_CACHE_TTL_MS.listing,
+      () => fetchListingFromNetwork(id),
+      options,
+    )
   }
 
   async function updateListing(
@@ -136,11 +215,51 @@ export function useListings() {
       throw new Error(error.message)
     }
 
-    return normalizeListing(data)
+    return writeListingThrough(normalizeListing(data))
   }
 
-  async function cancelListing(id: string): Promise<Listing> {
-    return updateListing(id, { status: 'cancelled' })
+  async function cancelListing(id: string, reason: string): Promise<Listing> {
+    const trimmed = reason.trim()
+    if (trimmed.length < 3) {
+      throw new Error('Please provide a reason for cancellation.')
+    }
+
+    const current = await fetchListing(id, { force: true })
+    if (!current) {
+      throw new Error('Listing not found.')
+    }
+
+    const cancellable = [
+      'draft',
+      'triaging',
+      'awaiting_acceptance',
+      'accepted',
+      'pickup_scheduled',
+    ]
+    if (!cancellable.includes(current.status)) {
+      throw new Error('This listing can no longer be cancelled.')
+    }
+
+    const cancelled = await updateListing(id, {
+      status: 'cancelled',
+      cancellation_reason: trimmed,
+      cancelled_at: new Date().toISOString(),
+    })
+
+    removeListingFromCache(id)
+    return cancelled
+  }
+
+  function peekListings(): Listing[] | null {
+    return cache.getCached<Listing[]>(RESIDENT_CACHE_KEYS.listings)?.data ?? null
+  }
+
+  function peekListing(id: string): Listing | null {
+    return cache.getCached<Listing>(RESIDENT_CACHE_KEYS.listing(id))?.data ?? null
+  }
+
+  function invalidateListings() {
+    cache.invalidate(RESIDENT_CACHE_KEYS.listings)
   }
 
   return {
@@ -149,5 +268,9 @@ export function useListings() {
     fetchListing,
     updateListing,
     cancelListing,
+    peekListings,
+    peekListing,
+    invalidateListings,
+    writeListingThrough,
   }
 }

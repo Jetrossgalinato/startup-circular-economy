@@ -3,10 +3,33 @@ import { toast } from 'vue-sonner'
 import {
   EMPTY_CONDITION,
   type HazardTier,
+  type HazardTriageResult,
   type ListingCondition,
   type PayoutMethod,
   type RateCardCategory,
 } from '@/types/listings'
+
+type TriageApiResponse = HazardTriageResult & {
+  source?: string
+  warning?: string
+}
+
+async function requestHazardTriage(body: {
+  categoryCode: string | null
+  categoryName?: string
+  condition: ListingCondition
+  photoUrls: string[]
+}, fallback = false): Promise<TriageApiResponse> {
+  // Cast URL to string to avoid Nuxt typed-routes $fetch recursion on /api/*
+  const url = fallback
+    ? '/api/hazard-triage?fallback=rules'
+    : '/api/hazard-triage'
+
+  return $fetch<TriageApiResponse>(url as string, {
+    method: 'POST',
+    body,
+  })
+}
 
 const steps = [
   'photos',
@@ -21,7 +44,7 @@ type Step = (typeof steps)[number]
 
 const { createListing, updateListing, fetchListing } = useListings()
 const { uploadPhotos, getSignedUrls } = useListingUpload()
-const { fetchCategories } = useRateCard()
+const { fetchCategories, peekCategories } = useRateCard()
 const { profile } = useAuth()
 
 const stepIndex = ref(0)
@@ -33,7 +56,7 @@ const photosUploaded = ref(false)
 const files = ref<File[]>([])
 const previews = ref<string[]>([])
 const condition = ref<ListingCondition>({ ...EMPTY_CONDITION })
-const categories = ref<RateCardCategory[]>([])
+const categories = ref<RateCardCategory[]>(peekCategories() ?? [])
 const categoryCode = ref<string | null>(null)
 const hazardTier = ref<HazardTier | null>(null)
 const triageReasons = ref<string[]>([])
@@ -141,28 +164,19 @@ async function runTriage() {
       .map((p) => p.signed_url)
       .filter((url): url is string => Boolean(url))
 
-    let result: { tier: HazardTier, reasons: string[], flags: string[] }
+    let result: HazardTriageResult
+
+    const triageBody = {
+      categoryCode: categoryCode.value,
+      categoryName: selectedCategory.value?.name,
+      condition: condition.value,
+      photoUrls,
+    }
 
     try {
-      result = await $fetch('/api/hazard-triage', {
-        method: 'POST',
-        body: {
-          categoryCode: categoryCode.value,
-          categoryName: selectedCategory.value?.name,
-          condition: condition.value,
-          photoUrls,
-        },
-      })
+      result = await requestHazardTriage(triageBody)
     } catch {
-      result = await $fetch('/api/hazard-triage?fallback=rules', {
-        method: 'POST',
-        body: {
-          categoryCode: categoryCode.value,
-          categoryName: selectedCategory.value?.name,
-          condition: condition.value,
-          photoUrls,
-        },
-      })
+      result = await requestHazardTriage(triageBody, true)
     }
 
     hazardTier.value = result.tier
@@ -190,7 +204,9 @@ async function runTriage() {
 
 async function goNext() {
   if (!canContinue() && step.value !== 'triage') {
-    toast.error('Complete this step to continue')
+    toast.error('Incomplete step', {
+      description: 'Complete this step to continue.',
+    })
     return
   }
 

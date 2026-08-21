@@ -7,19 +7,32 @@ definePageMeta({
   role: 'resident',
 })
 
-const { fetchMyListings } = useListings()
-const listings = ref<Listing[]>([])
-const loading = ref(true)
+const { fetchMyListings, peekListings } = useListings()
+const listings = ref<Listing[]>(peekListings() ?? [])
+const loading = ref(listings.value.length === 0 && peekListings() === null)
 
-onMounted(async () => {
+async function loadListings(force = false) {
+  const hadCache = peekListings() !== null
+  if (!hadCache) {
+    loading.value = true
+  }
+
   try {
-    listings.value = await fetchMyListings()
+    listings.value = await fetchMyListings({ force })
   } catch {
-    listings.value = []
+    if (!hadCache) {
+      listings.value = []
+    }
   } finally {
     loading.value = false
   }
-})
+}
+
+function onCancelled(id: string) {
+  listings.value = listings.value.filter((listing) => listing.id !== id)
+}
+
+onMounted(() => loadListings())
 </script>
 
 <template>
@@ -30,6 +43,10 @@ onMounted(async () => {
     <p class="mt-1.5 mb-6 text-sm text-muted-foreground">
       Track sell requests, pickups, weigh-in, and payouts.
     </p>
-    <ActivityList :listings="listings" :loading="loading" />
+    <ActivityList
+      :listings="listings"
+      :loading="loading"
+      @cancelled="onCancelled"
+    />
   </div>
 </template>

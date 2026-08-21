@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import type { Listing } from '@/types/listings'
+import { canCancelListing } from '@/types/listings'
 import { formatPeso, formatRatePerKg } from '@/utils/listings/format'
 
 defineProps<{
   listing: Listing
+  cancelling?: boolean
+}>()
+
+const emit = defineEmits<{
+  cancel: []
 }>()
 </script>
 
@@ -87,5 +93,17 @@ defineProps<{
         </li>
       </ul>
     </div>
+
+    <Button
+      v-if="canCancelListing(listing.status)"
+      type="button"
+      variant="outline"
+      size="lg"
+      class="h-11 w-full rounded-full border-neutral-200"
+      :disabled="cancelling"
+      @click="emit('cancel')"
+    >
+      {{ cancelling ? 'Cancelling…' : 'Cancel listing' }}
+    </Button>
   </div>
 </template>
