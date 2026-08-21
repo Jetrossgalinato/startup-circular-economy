@@ -1,0 +1,70 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - development
+
+jobs:
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Vercel secrets
+        run: |
+          missing=0
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::Missing GitHub secret VERCEL_TOKEN. Create one at https://vercel.com/account/tokens (not from .env.local)."
+            missing=1
+          elif [[ "$VERCEL_TOKEN" == eyJ* ]]; then
+            echo "::error::VERCEL_TOKEN looks like a VERCEL_OIDC_TOKEN (JWT). Create an Account Token at https://vercel.com/account/tokens and use that instead."
+            missing=1
+          fi
+          if [ -z "$VERCEL_ORG_ID" ]; then
+            echo "::error::Missing GitHub secret VERCEL_ORG_ID."
+            missing=1
+          fi
+          if [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::error::Missing GitHub secret VERCEL_PROJECT_ID."
+            missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+          echo "Secrets present (token length=${#VERCEL_TOKEN}, org=${VERCEL_ORG_ID:0:8}…, project=${VERCEL_PROJECT_ID:0:8}…)"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@59
+
+      - name: Link Vercel project
+        run: |
+          mkdir -p .vercel
+          printf '%s\n' "{\"orgId\":\"${VERCEL_ORG_ID}\",\"projectId\":\"${VERCEL_PROJECT_ID}\"}" > .vercel/project.json
+          cat .vercel/project.json
+
+      - name: Deploy to Vercel
+        run: |
+          # Remote build using project rootDirectory=frontend (same as local link).
+          # Skips `vercel pull`, which fails when the token cannot load project settings.
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            url=$(vercel deploy --yes --prod --token="$VERCEL_TOKEN")
+          else
+            url=$(vercel deploy --yes --token="$VERCEL_TOKEN")
+          fi
+          echo "Deployed to $url"
