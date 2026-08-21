@@ -65,6 +65,8 @@ export type Listing = {
   weight_kg: number | null
   quoted_rate_per_kg: number | null
   final_amount: number | null
+  cancellation_reason: string | null
+  cancelled_at: string | null
   created_at: string
   updated_at: string
   listing_photos?: ListingPhoto[]
@@ -122,4 +124,31 @@ export const CANCELLABLE_LISTING_STATUSES: ListingStatus[] = [
 export function canCancelListing(status: ListingStatus): boolean {
   return CANCELLABLE_LISTING_STATUSES.includes(status)
 }
+
+export const CANCELLATION_REASON_OPTIONS = [
+  { value: 'changed_mind', label: 'Changed my mind' },
+  { value: 'item_unavailable', label: 'Item no longer available' },
+  { value: 'wrong_details', label: 'Wrong category or details' },
+  { value: 'schedule_conflict', label: 'Scheduling conflict' },
+  { value: 'other', label: 'Other' },
+] as const
+
+export type CancellationReasonValue = (typeof CANCELLATION_REASON_OPTIONS)[number]['value']
+
+export function formatCancellationReason(
+  value: CancellationReasonValue | string,
+  details?: string,
+): string {
+  const option = CANCELLATION_REASON_OPTIONS.find((item) => item.value === value)
+  const label = option?.label ?? value
+  const trimmed = details?.trim()
+  if (value === 'other' && trimmed) {
+    return `Other: ${trimmed}`
+  }
+  if (trimmed && value !== 'other') {
+    return `${label} — ${trimmed}`
+  }
+  return label
+}
+
 

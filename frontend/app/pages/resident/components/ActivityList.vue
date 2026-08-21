@@ -4,7 +4,7 @@ import type { Listing } from '@/types/listings'
 import { LISTING_STATUS_LABELS, canCancelListing } from '@/types/listings'
 import { formatPeso, formatRatePerKg } from '@/utils/listings/format'
 
-const props = defineProps<{
+defineProps<{
   listings: Listing[]
   loading?: boolean
 }>()
@@ -14,36 +14,42 @@ const emit = defineEmits<{
 }>()
 
 const { cancelListing } = useListings()
-const cancellingId = ref<string | null>(null)
+const dialogOpen = ref(false)
+const targetListing = ref<Listing | null>(null)
+const submitting = ref(false)
 
-async function handleCancel(listing: Listing, event: Event) {
+function openCancelDialog(listing: Listing, event: Event) {
   event.preventDefault()
   event.stopPropagation()
 
-  if (!canCancelListing(listing.status) || cancellingId.value) {
+  if (!canCancelListing(listing.status) || submitting.value) {
     return
   }
 
-  const confirmed = window.confirm(
-    'Cancel this listing? Logistics will not pick it up.',
-  )
-  if (!confirmed) {
+  targetListing.value = listing
+  dialogOpen.value = true
+}
+
+async function confirmCancel(reason: string) {
+  if (!targetListing.value || submitting.value) {
     return
   }
 
-  cancellingId.value = listing.id
+  submitting.value = true
   try {
-    await cancelListing(listing.id)
+    await cancelListing(targetListing.value.id, reason)
     toast.success('Listing cancelled', {
       description: 'It has been removed from your active activity.',
     })
-    emit('cancelled', listing.id)
+    emit('cancelled', targetListing.value.id)
+    dialogOpen.value = false
+    targetListing.value = null
   } catch (error) {
     toast.error('Could not cancel listing', {
       description: error instanceof Error ? error.message : 'Try again.',
     })
   } finally {
-    cancellingId.value = null
+    submitting.value = false
   }
 }
 </script>
@@ -118,12 +124,18 @@ async function handleCancel(listing: Listing, event: Event) {
           variant="outline"
           size="sm"
           class="h-9 w-full rounded-full border-neutral-200 text-sm"
-          :disabled="cancellingId === listing.id"
-          @click="handleCancel(listing, $event)"
+          :disabled="submitting && targetListing?.id === listing.id"
+          @click="openCancelDialog(listing, $event)"
         >
-          {{ cancellingId === listing.id ? 'Cancelling…' : 'Cancel listing' }}
+          Cancel listing
         </Button>
       </div>
     </div>
+
+    <CancelListingDialog
+      v-model:open="dialogOpen"
+      :submitting="submitting"
+      @confirm="confirmCancel"
+    />
   </div>
 </template>

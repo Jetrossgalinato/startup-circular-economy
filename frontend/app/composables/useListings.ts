@@ -31,6 +31,8 @@ function normalizeListing(row: Record<string, unknown>): Listing {
     weight_kg: row.weight_kg != null ? Number(row.weight_kg) : null,
     quoted_rate_per_kg: row.quoted_rate_per_kg != null ? Number(row.quoted_rate_per_kg) : null,
     final_amount: row.final_amount != null ? Number(row.final_amount) : null,
+    cancellation_reason: (row.cancellation_reason as string | null) ?? null,
+    cancelled_at: (row.cancelled_at as string | null) ?? null,
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
     listing_photos: (row.listing_photos as Listing['listing_photos']) ?? [],
@@ -55,6 +57,8 @@ const LISTING_SELECT = `
   weight_kg,
   quoted_rate_per_kg,
   final_amount,
+  cancellation_reason,
+  cancelled_at,
   created_at,
   updated_at,
   listing_photos ( id, listing_id, storage_path, sort_order, created_at ),
@@ -139,7 +143,12 @@ export function useListings() {
     return normalizeListing(data)
   }
 
-  async function cancelListing(id: string): Promise<Listing> {
+  async function cancelListing(id: string, reason: string): Promise<Listing> {
+    const trimmed = reason.trim()
+    if (trimmed.length < 3) {
+      throw new Error('Please provide a reason for cancellation.')
+    }
+
     const current = await fetchListing(id)
     if (!current) {
       throw new Error('Listing not found.')
@@ -156,7 +165,11 @@ export function useListings() {
       throw new Error('This listing can no longer be cancelled.')
     }
 
-    return updateListing(id, { status: 'cancelled' })
+    return updateListing(id, {
+      status: 'cancelled',
+      cancellation_reason: trimmed,
+      cancelled_at: new Date().toISOString(),
+    })
   }
 
   return {

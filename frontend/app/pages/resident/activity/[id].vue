@@ -13,7 +13,8 @@ const route = useRoute()
 const { fetchListing, cancelListing } = useListings()
 const listing = ref<Listing | null>(null)
 const loading = ref(true)
-const cancelling = ref(false)
+const dialogOpen = ref(false)
+const submitting = ref(false)
 
 onMounted(async () => {
   try {
@@ -31,31 +32,32 @@ onMounted(async () => {
   }
 })
 
-async function handleCancel() {
-  if (!listing.value || !canCancelListing(listing.value.status) || cancelling.value) {
+function openCancelDialog() {
+  if (!listing.value || !canCancelListing(listing.value.status) || submitting.value) {
+    return
+  }
+  dialogOpen.value = true
+}
+
+async function confirmCancel(reason: string) {
+  if (!listing.value || submitting.value) {
     return
   }
 
-  const confirmed = window.confirm(
-    'Cancel this listing? Logistics will not pick it up.',
-  )
-  if (!confirmed) {
-    return
-  }
-
-  cancelling.value = true
+  submitting.value = true
   try {
-    await cancelListing(listing.value.id)
+    await cancelListing(listing.value.id, reason)
     toast.success('Listing cancelled', {
       description: 'It has been removed from your active activity.',
     })
+    dialogOpen.value = false
     await navigateTo('/resident/activity')
   } catch (error) {
     toast.error('Could not cancel listing', {
       description: error instanceof Error ? error.message : 'Try again.',
     })
   } finally {
-    cancelling.value = false
+    submitting.value = false
   }
 }
 </script>
@@ -76,8 +78,14 @@ async function handleCancel() {
       v-else-if="listing"
       class="mt-4"
       :listing="listing"
-      :cancelling="cancelling"
-      @cancel="handleCancel"
+      :cancelling="submitting"
+      @cancel="openCancelDialog"
+    />
+
+    <CancelListingDialog
+      v-model:open="dialogOpen"
+      :submitting="submitting"
+      @confirm="confirmCancel"
     />
   </div>
 </template>
