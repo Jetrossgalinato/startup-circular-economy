@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
-import { AUTH_INPUT_CLASS } from '@/constants/auth'
+import { AUTH_INPUT_CLASS, AUTH_MESSAGES, LOGOUT_REDIRECT_PATH } from '@/constants/auth'
 import type { PayoutMethodPreference } from '@/types/auth'
 
 const { profile, updateProfile, signOut } = useAuth()
@@ -53,11 +53,15 @@ async function handleLogout() {
   loggingOut.value = true
   try {
     await signOut()
-    toast.success('Logged out')
-    await navigateTo('/auth/login')
+    toast.success(AUTH_MESSAGES.logout.successTitle, {
+      description: AUTH_MESSAGES.logout.success,
+    })
+    await navigateTo(LOGOUT_REDIRECT_PATH)
   } catch (error) {
-    toast.error('Logout failed', {
-      description: error instanceof Error ? error.message : 'Try again.',
+    toast.error(AUTH_MESSAGES.logout.errorTitle, {
+      description: error instanceof Error
+        ? error.message
+        : AUTH_MESSAGES.logout.genericError,
     })
   } finally {
     loggingOut.value = false
