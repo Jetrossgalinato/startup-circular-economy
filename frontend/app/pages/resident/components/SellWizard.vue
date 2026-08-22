@@ -361,7 +361,15 @@ async function submitPickup() {
       v-if="step === 'triage' && hazardTier === 4"
       class="mt-4 text-center text-sm text-muted-foreground"
     >
-      DENR-EMB hotline / nearest accredited TSD — we cannot schedule this pickup.
+      We cannot schedule this pickup.
+      Call EMB Caraga
+      <a href="tel:+63853413826" class="font-semibold text-foreground underline underline-offset-2">
+        (085) 341-3826
+      </a>
+      or DENR
+      <a href="tel:8888" class="font-semibold text-foreground underline underline-offset-2">
+        8888
+      </a>.
     </p>
   </div>
 </template>

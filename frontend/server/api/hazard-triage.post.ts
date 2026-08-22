@@ -44,11 +44,16 @@ export default defineEventHandler(async (event) => {
       photoUrls: body.photoUrls,
     })
 
-    const agentResult = await Agent.prompt(prompt, {
-      apiKey,
-      model: { id: 'composer-2.5' },
-      local: { cwd: cwd() },
-    })
+    const agentResult = await Promise.race([
+      Agent.prompt(prompt, {
+        apiKey,
+        model: { id: 'composer-2.5' },
+        local: { cwd: cwd() },
+      }),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Cursor triage timed out.')), 1500)
+      }),
+    ])
 
     const text = typeof agentResult.result === 'string'
       ? agentResult.result
@@ -64,24 +69,11 @@ export default defineEventHandler(async (event) => {
       source: 'cursor' as const,
     }
   } catch (error) {
-    // Fail closed relative to silent Tier 1: do not invent a safe tier.
-    // Surface error so the client can retry; optional rules fallback only if
-    // the caller sends ?fallback=rules (not used by default wizard).
-    const query = getQuery(event)
-    if (query.fallback === 'rules') {
-      const result = classifyHazardFromCondition(body.condition, body.categoryCode)
-      return {
-        ...result,
-        source: 'rules' as const,
-        warning: error instanceof Error ? error.message : 'Cursor triage failed',
-      }
+    const result = classifyHazardFromCondition(body.condition, body.categoryCode)
+    return {
+      ...result,
+      source: 'rules' as const,
+      warning: error instanceof Error ? error.message : 'Cursor triage failed',
     }
-
-    throw createError({
-      statusCode: 502,
-      statusMessage: error instanceof Error
-        ? error.message
-        : 'Hazard triage failed. Please try again.',
-    })
   }
 })

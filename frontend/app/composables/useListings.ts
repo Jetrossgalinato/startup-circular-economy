@@ -38,6 +38,13 @@ function normalizeListing(row: Record<string, unknown>): Listing {
     final_amount: row.final_amount != null ? Number(row.final_amount) : null,
     cancellation_reason: (row.cancellation_reason as string | null) ?? null,
     cancelled_at: (row.cancelled_at as string | null) ?? null,
+    resale_eligible: row.resale_eligible !== false,
+    claimed_by: (row.claimed_by as string | null) ?? null,
+    claimed_at: (row.claimed_at as string | null) ?? null,
+    fulfillment_method: (row.fulfillment_method as Listing['fulfillment_method']) ?? null,
+    delivery_address: (row.delivery_address as string | null) ?? null,
+    claimed_seen_at: (row.claimed_seen_at as string | null) ?? null,
+    claim_confirmed_at: (row.claim_confirmed_at as string | null) ?? null,
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
     listing_photos: (row.listing_photos as Listing['listing_photos']) ?? [],
@@ -64,6 +71,13 @@ const LISTING_SELECT = `
   final_amount,
   cancellation_reason,
   cancelled_at,
+  resale_eligible,
+  claimed_by,
+  claimed_at,
+  fulfillment_method,
+  delivery_address,
+  claimed_seen_at,
+  claim_confirmed_at,
   created_at,
   updated_at,
   listing_photos ( id, listing_id, storage_path, sort_order, created_at ),
@@ -260,6 +274,7 @@ export function useListings() {
 
   function invalidateListings() {
     cache.invalidate(RESIDENT_CACHE_KEYS.listings)
+    cache.invalidate(RESIDENT_CACHE_KEYS.listingPrefix)
   }
 
   return {

@@ -1,5 +1,6 @@
 import type { RateCardCategory } from '@/types/listings'
 import { RESIDENT_CACHE_KEYS, RESIDENT_CACHE_TTL_MS, type ResidentCacheFetchOptions } from '@/constants/resident/cache'
+import { ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL_MS } from '@/constants/admin/cache'
 
 export function useRateCard() {
   const supabase = useSupabase()
@@ -42,9 +43,66 @@ export function useRateCard() {
     return cache.getCached<RateCardCategory[]>(RESIDENT_CACHE_KEYS.rateCard)?.data ?? null
   }
 
+  async function fetchAllCategoriesFromNetwork(): Promise<RateCardCategory[]> {
+    const { data, error } = await supabase
+      .from('rate_card_categories')
+      .select('code, name, examples, rate_per_kg, notes, active, sort_order')
+      .order('sort_order', { ascending: true })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return (data ?? []).map((row) => ({
+      ...row,
+      rate_per_kg: Number(row.rate_per_kg),
+    }))
+  }
+
+  async function fetchAllCategories(
+    options: ResidentCacheFetchOptions = {},
+  ): Promise<RateCardCategory[]> {
+    return cache.swr(
+      ADMIN_CACHE_KEYS.rateCardAll,
+      ADMIN_CACHE_TTL_MS.rateCardAll,
+      fetchAllCategoriesFromNetwork,
+      options,
+    )
+  }
+
+  function peekAllCategories(): RateCardCategory[] | null {
+    return cache.getCached<RateCardCategory[]>(ADMIN_CACHE_KEYS.rateCardAll)?.data ?? null
+  }
+
+  async function updateCategory(
+    code: string,
+    patch: Partial<Pick<RateCardCategory, 'rate_per_kg' | 'notes' | 'active'>>,
+  ): Promise<RateCardCategory> {
+    const { data, error } = await supabase
+      .from('rate_card_categories')
+      .update(patch)
+      .eq('code', code)
+      .select('code, name, examples, rate_per_kg, notes, active, sort_order')
+      .single()
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    cache.invalidate(RESIDENT_CACHE_KEYS.rateCard)
+    cache.invalidate(ADMIN_CACHE_KEYS.rateCardAll)
+    return {
+      ...data,
+      rate_per_kg: Number(data.rate_per_kg),
+    }
+  }
+
   return {
     fetchCategories,
     fetchCategory,
     peekCategories,
+    fetchAllCategories,
+    peekAllCategories,
+    updateCategory,
   }
 }

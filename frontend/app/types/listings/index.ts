@@ -6,8 +6,11 @@ export type ListingStatus =
   | 'pickup_scheduled'
   | 'weighed'
   | 'paid'
+  | 'claimed'
   | 'refused'
   | 'cancelled'
+
+export type FulfillmentMethod = 'pickup' | 'delivery'
 
 export type PayoutMethod = 'gcash' | 'cash'
 
@@ -67,10 +70,23 @@ export type Listing = {
   final_amount: number | null
   cancellation_reason: string | null
   cancelled_at: string | null
+  resale_eligible: boolean
+  claimed_by: string | null
+  claimed_at: string | null
+  fulfillment_method: FulfillmentMethod | null
+  delivery_address: string | null
+  claimed_seen_at: string | null
+  claim_confirmed_at: string | null
   created_at: string
   updated_at: string
   listing_photos?: ListingPhoto[]
   rate_card_categories?: Pick<RateCardCategory, 'code' | 'name' | 'rate_per_kg'> | null
+  resident?: {
+    id: string
+    full_name: string
+    phone: string | null
+    address: string | null
+  } | null
 }
 
 export type HazardTriageResult = {
@@ -108,8 +124,14 @@ export const LISTING_STATUS_LABELS: Record<ListingStatus, string> = {
   pickup_scheduled: 'Pickup scheduled',
   weighed: 'Weighed — payout pending',
   paid: 'Paid',
+  claimed: 'Claimed',
   refused: 'Intake refused',
   cancelled: 'Cancelled',
+}
+
+export const FULFILLMENT_LABELS: Record<FulfillmentMethod, string> = {
+  pickup: 'Pickup at cross-dock',
+  delivery: 'Delivery',
 }
 
 /** Residents can cancel before logistics weigh-in or payout. */

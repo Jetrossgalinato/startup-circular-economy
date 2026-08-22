@@ -16,23 +16,32 @@ const listing = ref<Listing | null>(peekListing(listingId.value))
 const loading = ref(listing.value == null)
 const dialogOpen = ref(false)
 const submitting = ref(false)
+const { listingsTick } = useRealtimeTicks()
 
-onMounted(async () => {
+async function loadListing(showError = true) {
   try {
-    listing.value = await fetchListing(listingId.value)
-    if (!listing.value) {
+    listing.value = await fetchListing(listingId.value, { force: true })
+    if (!listing.value && showError) {
       toast.error('Listing not found', {
         description: 'It may have been cancelled or removed.',
       })
       await navigateTo('/resident/activity')
     }
   } catch (error) {
-    toast.error('Could not load listing', {
-      description: error instanceof Error ? error.message : 'Try again later.',
-    })
+    if (showError) {
+      toast.error('Could not load listing', {
+        description: error instanceof Error ? error.message : 'Try again later.',
+      })
+    }
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => loadListing())
+
+watch(listingsTick, () => {
+  void loadListing(false)
 })
 
 function openCancelDialog() {
