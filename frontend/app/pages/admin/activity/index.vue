@@ -10,8 +10,9 @@ definePageMeta({
 const { fetchAllListings } = useAdminListings()
 const listings = ref<Listing[]>([])
 const loading = ref(true)
+const { listingsTick } = useRealtimeTicks()
 
-onMounted(async () => {
+async function loadActivity() {
   try {
     listings.value = await fetchAllListings()
   } catch {
@@ -19,6 +20,12 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => loadActivity())
+
+watch(listingsTick, () => {
+  void loadActivity()
 })
 </script>
 

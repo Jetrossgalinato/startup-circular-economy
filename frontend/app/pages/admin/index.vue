@@ -15,12 +15,13 @@ const { fetchCategories, peekCategories } = useRateCard()
 const summary = ref<AdminOpsSummary>({ scheduled: 0, weighed: 0, paidToday: 0 })
 const categories = ref<RateCardCategory[]>(peekCategories() ?? [])
 const loading = ref(true)
+const { listingsTick, rateCardTick } = useRealtimeTicks()
 
-onMounted(async () => {
+async function loadHome() {
   try {
     const [nextSummary, nextCategories] = await Promise.all([
       fetchOpsSummary(),
-      fetchCategories(),
+      fetchCategories({ force: true }),
     ])
     summary.value = nextSummary
     categories.value = nextCategories
@@ -29,6 +30,20 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => loadHome())
+
+watch(listingsTick, () => {
+  void fetchOpsSummary().then((next) => {
+    summary.value = next
+  }).catch(() => {})
+})
+
+watch(rateCardTick, () => {
+  void fetchCategories({ force: true }).then((next) => {
+    categories.value = next
+  }).catch(() => {})
 })
 </script>
 

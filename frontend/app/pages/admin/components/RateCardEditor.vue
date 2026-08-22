@@ -5,13 +5,14 @@ import { AUTH_INPUT_CLASS } from '@/constants/auth'
 import { formatRatePerKg } from '@/utils/listings/format'
 
 const { fetchAllCategories, updateCategory } = useRateCard()
+const { rateCardTick } = useRealtimeTicks()
 
 const categories = ref<RateCardCategory[]>([])
 const drafts = ref<Record<string, string>>({})
 const loading = ref(true)
 const savingCode = ref<string | null>(null)
 
-onMounted(async () => {
+async function loadRates(showError = true) {
   try {
     const rows = await fetchAllCategories()
     categories.value = rows
@@ -19,12 +20,23 @@ onMounted(async () => {
       rows.map((row) => [row.code, String(row.rate_per_kg)]),
     )
   } catch (error) {
-    toast.error('Could not load rate card', {
-      description: error instanceof Error ? error.message : 'Try again later.',
-    })
+    if (showError) {
+      toast.error('Could not load rate card', {
+        description: error instanceof Error ? error.message : 'Try again later.',
+      })
+    }
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => loadRates())
+
+watch(rateCardTick, () => {
+  if (savingCode.value) {
+    return
+  }
+  void loadRates(false)
 })
 
 function isDirty(category: RateCardCategory) {

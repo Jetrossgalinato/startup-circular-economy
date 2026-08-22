@@ -262,6 +262,7 @@ export function useListings() {
 
   function invalidateListings() {
     cache.invalidate(RESIDENT_CACHE_KEYS.listings)
+    cache.invalidate(RESIDENT_CACHE_KEYS.listingPrefix)
   }
 
   return {

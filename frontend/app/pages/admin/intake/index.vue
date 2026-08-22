@@ -10,8 +10,9 @@ definePageMeta({
 const { fetchIntakeQueue } = useAdminListings()
 const listings = ref<Listing[]>([])
 const loading = ref(true)
+const { listingsTick } = useRealtimeTicks()
 
-onMounted(async () => {
+async function loadQueue() {
   try {
     listings.value = await fetchIntakeQueue()
   } catch {
@@ -19,6 +20,12 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => loadQueue())
+
+watch(listingsTick, () => {
+  void loadQueue()
 })
 </script>
 

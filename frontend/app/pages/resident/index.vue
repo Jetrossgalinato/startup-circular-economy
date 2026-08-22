@@ -14,6 +14,7 @@ const { fetchCategories, peekCategories } = useRateCard()
 const listings = ref<Listing[]>(peekListings() ?? [])
 const categories = ref<RateCardCategory[]>(peekCategories() ?? [])
 const loading = ref(listings.value.length === 0 && categories.value.length === 0)
+const { listingsTick, rateCardTick } = useRealtimeTicks()
 
 const activeCount = computed(() =>
   listings.value.filter((l) =>
@@ -23,11 +24,11 @@ const activeCount = computed(() =>
 
 const recent = computed(() => listings.value.slice(0, 3))
 
-onMounted(async () => {
+async function loadHome(force = false) {
   try {
     const [nextListings, nextCategories] = await Promise.all([
-      fetchMyListings(),
-      fetchCategories(),
+      fetchMyListings({ force }),
+      fetchCategories({ force }),
     ])
     listings.value = nextListings
     categories.value = nextCategories
@@ -36,6 +37,18 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => loadHome())
+
+watch(listingsTick, () => {
+  void loadHome(true)
+})
+
+watch(rateCardTick, () => {
+  void fetchCategories({ force: true }).then((next) => {
+    categories.value = next
+  }).catch(() => {})
 })
 </script>
 

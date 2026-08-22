@@ -13,23 +13,32 @@ const listingId = computed(() => String(route.params.id))
 const { fetchListing } = useAdminListings()
 const listing = ref<Listing | null>(null)
 const loading = ref(true)
+const { listingsTick } = useRealtimeTicks()
 
-onMounted(async () => {
+async function loadListing(showError = true) {
   try {
     listing.value = await fetchListing(listingId.value)
-    if (!listing.value) {
+    if (!listing.value && showError) {
       toast.error('Listing not found', {
         description: 'It may have been cancelled or already processed.',
       })
       await navigateTo('/admin/intake')
     }
   } catch (error) {
-    toast.error('Could not load listing', {
-      description: error instanceof Error ? error.message : 'Try again later.',
-    })
+    if (showError) {
+      toast.error('Could not load listing', {
+        description: error instanceof Error ? error.message : 'Try again later.',
+      })
+    }
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => loadListing())
+
+watch(listingsTick, () => {
+  void loadListing(false)
 })
 
 async function onCompleted() {
