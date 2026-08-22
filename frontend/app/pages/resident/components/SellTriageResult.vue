@@ -53,8 +53,8 @@ function startRamp() {
     if (progress.value >= 90) {
       return
     }
-    progress.value = Math.min(90, progress.value + Math.max(0.6, (90 - progress.value) * 0.08))
-  }, 120)
+    progress.value = Math.min(90, progress.value + Math.max(5, (90 - progress.value) * 0.22))
+  }, 40)
 }
 
 watch(
@@ -79,7 +79,7 @@ watch(
     progress.value = 100
     completeTimer = setTimeout(() => {
       showResult.value = true
-    }, 220)
+    }, 80)
   },
   { immediate: true },
 )
