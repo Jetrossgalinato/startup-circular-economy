@@ -33,9 +33,18 @@ const tierCopy: Record<HazardTier, { title: string; body: string; tone: string }
 
 const copy = computed(() => tierCopy[props.tier])
 
+const STATUS_MESSAGES = [
+  'Checking photos and condition…',
+  'Looking for batteries, leaks, and damage…',
+  'Running safety classification…',
+  'Routing the right handling track…',
+] as const
+
 const progress = ref(8)
 const showResult = ref(!props.loading)
+const statusIndex = ref(0)
 let rampTimer: ReturnType<typeof setInterval> | null = null
+let statusTimer: ReturnType<typeof setInterval> | null = null
 let completeTimer: ReturnType<typeof setTimeout> | null = null
 
 function stopRamp() {
@@ -43,11 +52,16 @@ function stopRamp() {
     clearInterval(rampTimer)
     rampTimer = null
   }
+  if (statusTimer) {
+    clearInterval(statusTimer)
+    statusTimer = null
+  }
 }
 
 function startRamp() {
   stopRamp()
   progress.value = 8
+  statusIndex.value = 0
   showResult.value = false
   rampTimer = setInterval(() => {
     if (progress.value >= 90) {
@@ -55,6 +69,9 @@ function startRamp() {
     }
     progress.value = Math.min(90, progress.value + Math.max(5, (90 - progress.value) * 0.22))
   }, 40)
+  statusTimer = setInterval(() => {
+    statusIndex.value = (statusIndex.value + 1) % STATUS_MESSAGES.length
+  }, 4500)
 }
 
 watch(
@@ -126,7 +143,7 @@ onUnmounted(() => {
         />
       </div>
       <p class="mt-3 text-sm text-muted-foreground">
-        Running safety classification…
+        {{ STATUS_MESSAGES[statusIndex] }}
       </p>
     </div>
 
