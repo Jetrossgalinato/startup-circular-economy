@@ -31,6 +31,59 @@ const tierCopy: Record<HazardTier, { title: string; body: string; tone: string }
 }
 
 const copy = computed(() => tierCopy[props.tier])
+
+const progress = ref(8)
+const showResult = ref(!props.loading)
+let rampTimer: ReturnType<typeof setInterval> | null = null
+let completeTimer: ReturnType<typeof setTimeout> | null = null
+
+function stopRamp() {
+  if (rampTimer) {
+    clearInterval(rampTimer)
+    rampTimer = null
+  }
+}
+
+function startRamp() {
+  stopRamp()
+  progress.value = 8
+  showResult.value = false
+  rampTimer = setInterval(() => {
+    if (progress.value >= 90) {
+      return
+    }
+    progress.value = Math.min(90, progress.value + Math.max(0.6, (90 - progress.value) * 0.08))
+  }, 120)
+}
+
+watch(
+  () => props.loading,
+  (loading) => {
+    if (completeTimer) {
+      clearTimeout(completeTimer)
+      completeTimer = null
+    }
+
+    if (loading) {
+      startRamp()
+      return
+    }
+
+    stopRamp()
+    progress.value = 100
+    completeTimer = setTimeout(() => {
+      showResult.value = true
+    }, 220)
+  },
+  { immediate: true },
+)
+
+onUnmounted(() => {
+  stopRamp()
+  if (completeTimer) {
+    clearTimeout(completeTimer)
+  }
+})
 </script>
 
 <template>
@@ -43,9 +96,23 @@ const copy = computed(() => tierCopy[props.tier])
       Our first job is safety — not guessing resale value.
     </p>
 
-    <div v-if="loading" class="mt-8 flex flex-col items-center gap-3 py-10">
-      <div class="size-10 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
-      <p class="text-sm text-muted-foreground">Running safety classification…</p>
+    <div v-if="!showResult" class="mt-8 py-6">
+      <div
+        class="h-2 w-full overflow-hidden rounded-full bg-neutral-200"
+        role="progressbar"
+        :aria-valuenow="Math.round(progress)"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-label="Safety classification"
+      >
+        <div
+          class="h-full rounded-full bg-foreground transition-[width] duration-150 ease-out"
+          :style="{ width: `${progress}%` }"
+        />
+      </div>
+      <p class="mt-3 text-sm text-muted-foreground">
+        Running safety classification…
+      </p>
     </div>
 
     <div v-else class="mt-5 space-y-4">
