@@ -3,6 +3,7 @@ import { toast } from 'vue-sonner'
 import type { Listing } from '@/types/listings'
 import { LISTING_STATUS_LABELS, canCancelListing } from '@/types/listings'
 import { formatListingDate, formatPeso, formatRatePerKg } from '@/utils/listings/format'
+import { claimBadgeLabel } from '@/utils/listings/claims'
 
 defineProps<{
   listings: Listing[]
@@ -94,7 +95,11 @@ async function confirmCancel(reason: string) {
             <p class="text-sm font-semibold">
               {{ listing.rate_card_categories?.name || listing.category_code || 'Uncategorized' }}
             </p>
-            <ActivityStatusBadge :status="listing.status" class="mt-1.5" />
+            <ActivityStatusBadge
+              :status="listing.status"
+              :label="claimBadgeLabel(listing)"
+              class="mt-1.5"
+            />
           </div>
           <p class="text-xs text-muted-foreground">
             {{ formatListingDate(listing.created_at) }}

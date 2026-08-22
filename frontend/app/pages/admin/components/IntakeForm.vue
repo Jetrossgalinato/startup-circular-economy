@@ -3,6 +3,7 @@ import { toast } from 'vue-sonner'
 import type { HazardTier, Listing } from '@/types/listings'
 import { AUTH_INPUT_CLASS } from '@/constants/auth'
 import { formatPeso, formatRatePerKg } from '@/utils/listings/format'
+import { claimBadgeLabel } from '@/utils/listings/claims'
 
 const props = defineProps<{
   listing: Listing
@@ -105,7 +106,11 @@ async function submit() {
       <h2 class="mt-1 text-xl font-bold tracking-tight">
         {{ listing.rate_card_categories?.name || listing.category_code || 'Item' }}
       </h2>
-      <ActivityStatusBadge :status="listing.status" class="mt-2" />
+      <ActivityStatusBadge
+        :status="listing.status"
+        :label="claimBadgeLabel(listing)"
+        class="mt-2"
+      />
       <p class="mt-3 text-sm text-muted-foreground">
         Rate {{ formatRatePerKg(quotedRate) }} · AI/rules flagged
         {{ listing.hazard_tier ? `tier ${listing.hazard_tier}` : 'no tier yet' }}.

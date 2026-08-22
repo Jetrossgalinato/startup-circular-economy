@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Listing } from '@/types/listings'
+import { claimBadgeLabel } from '@/utils/listings/claims'
 
 defineProps<{
   listings: Listing[]
@@ -36,7 +37,11 @@ defineProps<{
           <p class="text-sm font-semibold">
             {{ listing.rate_card_categories?.name || listing.category_code || 'Uncategorized' }}
           </p>
-          <ActivityStatusBadge :status="listing.status" class="mt-1.5" />
+          <ActivityStatusBadge
+            :status="listing.status"
+            :label="claimBadgeLabel(listing)"
+            class="mt-1.5"
+          />
         </div>
         <p v-if="listing.hazard_tier" class="text-xs font-semibold text-muted-foreground">
           Tier {{ listing.hazard_tier }}

@@ -9,23 +9,36 @@ const props = defineProps<{
   class?: string
 }>()
 
+const displayLabel = computed(() => props.label || LISTING_STATUS_LABELS[props.status])
+
 const tone = computed(() => {
+  if (props.label === 'Pending') {
+    return 'bg-amber-100 text-amber-950'
+  }
+  if (props.label === 'Confirmed') {
+    return 'bg-teal-100 text-teal-900'
+  }
+
   switch (props.status) {
     case 'paid':
       return 'bg-emerald-100 text-emerald-900'
     case 'claimed':
-      return 'bg-[#dce8ee] text-foreground'
+      return 'bg-teal-100 text-teal-900'
     case 'refused':
     case 'cancelled':
       return 'bg-red-100 text-red-900'
     case 'pickup_scheduled':
+      return 'bg-sky-100 text-sky-900'
     case 'weighed':
-      return 'bg-[#dce8ee] text-foreground'
+      return 'bg-violet-100 text-violet-900'
     case 'awaiting_acceptance':
+      return 'bg-amber-100 text-amber-950'
     case 'accepted':
       return 'bg-[#ead9c4] text-foreground'
+    case 'triaging':
+      return 'bg-sky-100 text-sky-900'
     default:
-      return 'bg-neutral-100 text-foreground'
+      return 'bg-neutral-100 text-neutral-700'
   }
 })
 </script>
@@ -38,6 +51,6 @@ const tone = computed(() => {
       props.class,
     )"
   >
-    {{ label || LISTING_STATUS_LABELS[status] }}
+    {{ displayLabel }}
   </span>
 </template>
