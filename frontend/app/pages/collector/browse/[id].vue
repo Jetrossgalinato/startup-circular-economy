@@ -2,6 +2,7 @@
 import type { FulfillmentMethod, Listing } from '@/types/listings'
 import { toast } from 'vue-sonner'
 import { formatPeso, formatRatePerKg } from '@/utils/listings/format'
+import { claimBadgeLabel, collectorClaimMessage } from '@/utils/listings/claims'
 
 definePageMeta({
   layout: 'inside',
@@ -11,7 +12,7 @@ definePageMeta({
 
 const route = useRoute()
 const listingId = computed(() => String(route.params.id))
-const { profile } = useAuth()
+const { profile, user } = useAuth()
 const { fetchListing, peekListing, claimListing } = useCollectorStock()
 const { getSignedUrls } = useListingUpload()
 const { listingsTick } = useRealtimeTicks()
@@ -24,6 +25,10 @@ const photos = ref(listing.value?.listing_photos ?? [])
 
 const canDeliver = computed(() =>
   Boolean(profile.value?.address?.trim() && profile.value?.phone?.trim()),
+)
+
+const isOwnClaim = computed(() =>
+  listing.value?.status === 'claimed' && listing.value.claimed_by === user.value?.id,
 )
 
 async function loadListing(showError = true, force = false) {
@@ -126,7 +131,11 @@ async function claim() {
         <h1 class="mt-1 text-2xl font-bold tracking-tight">
           {{ listing.rate_card_categories?.name || listing.category_code || 'Item' }}
         </h1>
-        <ActivityStatusBadge :status="listing.status" class="mt-2" />
+        <ActivityStatusBadge
+          :status="listing.status"
+          :label="claimBadgeLabel(listing)"
+          class="mt-2"
+        />
       </div>
 
       <div class="grid grid-cols-2 gap-3">
@@ -171,6 +180,9 @@ async function claim() {
           {{ claiming ? 'Claiming…' : 'Claim item' }}
         </Button>
       </template>
+      <p v-else-if="isOwnClaim" class="text-sm text-foreground">
+        {{ collectorClaimMessage(listing) }}
+      </p>
       <p v-else class="text-sm text-muted-foreground">
         This lot is already claimed. See Orders.
       </p>

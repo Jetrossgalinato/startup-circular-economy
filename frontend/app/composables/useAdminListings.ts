@@ -38,6 +38,7 @@ const ADMIN_LISTING_SELECT = `
   fulfillment_method,
   delivery_address,
   claimed_seen_at,
+  claim_confirmed_at,
   created_at,
   updated_at,
   listing_photos ( id, listing_id, storage_path, sort_order, created_at ),
@@ -79,6 +80,7 @@ function normalizeAdminListing(row: Record<string, unknown>): Listing {
     fulfillment_method: (row.fulfillment_method as Listing['fulfillment_method']) ?? null,
     delivery_address: (row.delivery_address as string | null) ?? null,
     claimed_seen_at: (row.claimed_seen_at as string | null) ?? null,
+    claim_confirmed_at: (row.claim_confirmed_at as string | null) ?? null,
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
     listing_photos: (row.listing_photos as Listing['listing_photos']) ?? [],
@@ -359,5 +361,6 @@ export function useAdminListings() {
     peekAllListings,
     peekListing,
     invalidateAdminListings,
+    writeAdminListingThrough,
   }
 }

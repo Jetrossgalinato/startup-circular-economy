@@ -1,10 +1,51 @@
 <script setup lang="ts">
 import type { Listing } from '@/types/listings'
+import { toast } from 'vue-sonner'
 import { formatPeso, formatRatePerKg } from '@/utils/listings/format'
+import { claimBadgeLabel, isConfirmedClaim, isPendingClaim } from '@/utils/listings/claims'
 
 const props = defineProps<{
   listing: Listing
 }>()
+
+const emit = defineEmits<{
+  updated: [listing: Listing]
+}>()
+
+const { confirmClaim, rejectClaim } = useAdminClaims()
+const busy = ref(false)
+
+async function confirm() {
+  if (busy.value) {
+    return
+  }
+  busy.value = true
+  try {
+    emit('updated', await confirmClaim(props.listing.id))
+  } catch (error) {
+    toast.error('Could not confirm claim', {
+      description: error instanceof Error ? error.message : 'Try again later.',
+    })
+  } finally {
+    busy.value = false
+  }
+}
+
+async function reject() {
+  if (busy.value) {
+    return
+  }
+  busy.value = true
+  try {
+    emit('updated', await rejectClaim(props.listing.id))
+  } catch (error) {
+    toast.error('Could not reject claim', {
+      description: error instanceof Error ? error.message : 'Try again later.',
+    })
+  } finally {
+    busy.value = false
+  }
+}
 
 const { getSignedUrls } = useListingUpload()
 const photos = ref(props.listing.listing_photos ?? [])
@@ -27,7 +68,11 @@ onMounted(async () => {
       <h2 class="mt-1 text-xl font-bold tracking-tight">
         {{ listing.rate_card_categories?.name || listing.category_code || 'Item' }}
       </h2>
-      <ActivityStatusBadge :status="listing.status" class="mt-2" />
+      <ActivityStatusBadge
+        :status="listing.status"
+        :label="claimBadgeLabel(listing)"
+        class="mt-2"
+      />
     </div>
 
     <div
@@ -103,6 +148,30 @@ onMounted(async () => {
       >
         {{ listing.delivery_address }}
       </p>
+      <p class="mt-2 text-sm text-muted-foreground">
+        {{ isConfirmedClaim(listing)
+          ? 'Confirmed for this collector.'
+          : 'Waiting for confirm or reject.' }}
+      </p>
+      <div v-if="isPendingClaim(listing)" class="mt-3 flex gap-2">
+        <Button
+          type="button"
+          class="h-10 flex-1 rounded-full bg-foreground text-white hover:bg-foreground/90"
+          :disabled="busy"
+          @click="confirm"
+        >
+          {{ busy ? 'Saving…' : 'Confirm' }}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          class="h-10 flex-1 rounded-full"
+          :disabled="busy"
+          @click="reject"
+        >
+          Reject
+        </Button>
+      </div>
     </div>
 
     <Button

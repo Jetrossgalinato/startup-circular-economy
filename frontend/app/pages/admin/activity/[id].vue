@@ -58,6 +58,7 @@ watch(listingsTick, () => {
       v-else-if="listing"
       class="mt-4"
       :listing="listing"
+      @updated="listing = $event"
     />
   </div>
 </template>

@@ -2,6 +2,7 @@
 import type { Listing } from '@/types/listings'
 import { FULFILLMENT_LABELS } from '@/types/listings'
 import { formatListingDate, formatPeso } from '@/utils/listings/format'
+import { collectorClaimMessage } from '@/utils/listings/claims'
 
 definePageMeta({
   layout: 'inside',
@@ -87,6 +88,9 @@ watch(listingsTick, () => {
         </p>
         <p v-else-if="listing.fulfillment_method === 'pickup'" class="mt-1 text-sm text-muted-foreground">
           Collect at the Butuan City cross-dock. Staff will match this order.
+        </p>
+        <p class="mt-3 text-sm font-medium text-foreground">
+          {{ collectorClaimMessage(listing) }}
         </p>
         <p class="mt-2 text-xs text-muted-foreground">
           {{ listing.claimed_at ? formatListingDate(listing.claimed_at) : formatListingDate(listing.created_at) }}

@@ -13,7 +13,8 @@ import {
 export function useAdminClaims() {
   const supabase = useSupabase()
   const cache = useResidentCache()
-  const { fetchAllListings, peekAllListings } = useAdminListings()
+  const { fetchAllListings, peekAllListings, fetchListing, writeAdminListingThrough } = useAdminListings()
+  const { writeListingThrough } = useListings()
 
   function peekClaims(): Listing[] | null {
     const cached = cache.getCached<Listing[]>(ADMIN_CACHE_KEYS.claims)?.data
@@ -93,10 +94,78 @@ export function useAdminClaims() {
     return nextClaims
   }
 
+  async function confirmClaim(id: string): Promise<Listing> {
+    const now = new Date().toISOString()
+    const { data, error } = await supabase
+      .from('listings')
+      .update({
+        claim_confirmed_at: now,
+        claimed_seen_at: now,
+      })
+      .eq('id', id)
+      .eq('status', 'claimed')
+      .is('claim_confirmed_at', null)
+      .select('id')
+      .maybeSingle()
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    if (!data) {
+      throw new Error('This claim is no longer pending.')
+    }
+
+    const listing = await fetchListing(id, { force: true })
+    if (!listing) {
+      throw new Error('Claim not found.')
+    }
+
+    writeListingThrough(listing)
+    writeAdminListingThrough(listing)
+    return listing
+  }
+
+  async function rejectClaim(id: string): Promise<Listing> {
+    const { data, error } = await supabase
+      .from('listings')
+      .update({
+        status: 'paid',
+        claimed_by: null,
+        claimed_at: null,
+        fulfillment_method: null,
+        delivery_address: null,
+        claimed_seen_at: null,
+        claim_confirmed_at: null,
+      })
+      .eq('id', id)
+      .eq('status', 'claimed')
+      .is('claim_confirmed_at', null)
+      .select('id')
+      .maybeSingle()
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    if (!data) {
+      throw new Error('This claim is no longer pending.')
+    }
+
+    const listing = await fetchListing(id, { force: true })
+    if (!listing) {
+      throw new Error('Claim not found.')
+    }
+
+    writeListingThrough(listing)
+    writeAdminListingThrough(listing)
+    return listing
+  }
+
   return {
     fetchClaims,
     fetchUnreadCount,
     markClaimsSeen,
+    confirmClaim,
+    rejectClaim,
     peekClaims,
     peekUnreadCount,
   }

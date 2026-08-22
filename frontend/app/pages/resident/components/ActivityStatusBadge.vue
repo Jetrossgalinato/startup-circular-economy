@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 
 const props = defineProps<{
   status: ListingStatus
+  label?: string
   class?: string
 }>()
 
@@ -37,6 +38,6 @@ const tone = computed(() => {
       props.class,
     )"
   >
-    {{ LISTING_STATUS_LABELS[status] }}
+    {{ label || LISTING_STATUS_LABELS[status] }}
   </span>
 </template>

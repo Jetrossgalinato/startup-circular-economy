@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Listing } from '@/types/listings'
 import { formatPeso, formatRatePerKg } from '@/utils/listings/format'
+import { claimBadgeLabel } from '@/utils/listings/claims'
 
 defineProps<{
   listing: Listing
@@ -14,7 +15,11 @@ defineProps<{
         <p class="text-sm font-semibold">
           {{ listing.rate_card_categories?.name || listing.category_code || 'Item' }}
         </p>
-        <ActivityStatusBadge :status="listing.status" class="mt-1.5" />
+        <ActivityStatusBadge
+          :status="listing.status"
+          :label="claimBadgeLabel(listing)"
+          class="mt-1.5"
+        />
       </div>
       <p class="text-sm font-semibold">
         {{ listing.final_amount != null ? formatPeso(listing.final_amount) : formatRatePerKg(listing.quoted_rate_per_kg) }}
