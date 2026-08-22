@@ -11,6 +11,7 @@ import {
   ADMIN_CACHE_TTL_MS,
   type AdminCacheFetchOptions,
 } from '@/constants/admin/cache'
+import { claimedListings, unreadClaimCount } from '@/utils/listings/claims'
 
 const ADMIN_LISTING_SELECT = `
   id,
@@ -137,16 +138,30 @@ export function useAdminListings() {
 
     const all = peekAllListings()
     if (all) {
-      const without = all.filter((item) => item.id !== listing.id)
-      cache.setCached(
-        ADMIN_CACHE_KEYS.listings,
-        [listing, ...without].sort(
-          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-        ),
+      const nextAll = [listing, ...all.filter((item) => item.id !== listing.id)].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       )
+      cache.setCached(ADMIN_CACHE_KEYS.listings, nextAll)
+      syncClaimsCache(nextAll)
+    } else {
+      const claims = cache.getCached<Listing[]>(ADMIN_CACHE_KEYS.claims)?.data
+      if (claims) {
+        const without = claims.filter((item) => item.id !== listing.id)
+        const nextClaims = listing.status === 'claimed'
+          ? claimedListings([listing, ...without])
+          : without
+        cache.setCached(ADMIN_CACHE_KEYS.claims, nextClaims)
+        cache.setCached(ADMIN_CACHE_KEYS.claimsUnread, unreadClaimCount(nextClaims))
+      }
     }
 
     cache.invalidate(ADMIN_CACHE_KEYS.opsSummary)
+  }
+
+  function syncClaimsCache(listings: Listing[]) {
+    const claims = claimedListings(listings)
+    cache.setCached(ADMIN_CACHE_KEYS.claims, claims)
+    cache.setCached(ADMIN_CACHE_KEYS.claimsUnread, unreadClaimCount(claims))
   }
 
   function invalidateAdminListings() {
@@ -154,6 +169,8 @@ export function useAdminListings() {
     cache.invalidate(ADMIN_CACHE_KEYS.intakeQueue)
     cache.invalidate(ADMIN_CACHE_KEYS.listings)
     cache.invalidate(ADMIN_CACHE_KEYS.listingPrefix)
+    cache.invalidate(ADMIN_CACHE_KEYS.claims)
+    cache.invalidate(ADMIN_CACHE_KEYS.claimsUnread)
   }
 
   async function fetchListingFromNetwork(id: string): Promise<Listing | null> {
@@ -225,6 +242,7 @@ export function useAdminListings() {
     for (const listing of listings) {
       cache.setCached(ADMIN_CACHE_KEYS.listing(listing.id), listing)
     }
+    syncClaimsCache(listings)
     return listings
   }
 

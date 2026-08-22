@@ -4,29 +4,40 @@ import {
   ADMIN_CACHE_TTL_MS,
   type AdminCacheFetchOptions,
 } from '@/constants/admin/cache'
+import {
+  claimedListings,
+  stampClaimsSeen,
+  unreadClaimCount,
+} from '@/utils/listings/claims'
 
 export function useAdminClaims() {
   const supabase = useSupabase()
   const cache = useResidentCache()
-  const { fetchAllListings } = useAdminListings()
+  const { fetchAllListings, peekAllListings } = useAdminListings()
 
   function peekClaims(): Listing[] | null {
-    return cache.getCached<Listing[]>(ADMIN_CACHE_KEYS.claims)?.data ?? null
+    const cached = cache.getCached<Listing[]>(ADMIN_CACHE_KEYS.claims)?.data
+    if (cached) {
+      return cached
+    }
+    const all = peekAllListings()
+    return all ? claimedListings(all) : null
   }
 
   function peekUnreadCount(): number | null {
-    return cache.getCached<number>(ADMIN_CACHE_KEYS.claimsUnread)?.data ?? null
+    const cached = cache.getCached<number>(ADMIN_CACHE_KEYS.claimsUnread)?.data
+    if (cached != null) {
+      return cached
+    }
+    const claims = peekClaims()
+    return claims ? unreadClaimCount(claims) : null
   }
 
-  async function fetchClaimsFromNetwork(): Promise<Listing[]> {
-    const listings = await fetchAllListings({ force: true })
-    return listings
-      .filter((listing) => listing.status === 'claimed')
-      .sort((a, b) => {
-        const aTime = new Date(a.claimed_at ?? a.updated_at).getTime()
-        const bTime = new Date(b.claimed_at ?? b.updated_at).getTime()
-        return bTime - aTime
-      })
+  async function fetchClaimsFromNetwork(
+    options: AdminCacheFetchOptions,
+  ): Promise<Listing[]> {
+    const listings = await fetchAllListings(options)
+    return claimedListings(listings)
   }
 
   async function fetchClaims(
@@ -35,11 +46,10 @@ export function useAdminClaims() {
     const claims = await cache.swr(
       ADMIN_CACHE_KEYS.claims,
       ADMIN_CACHE_TTL_MS.claims,
-      fetchClaimsFromNetwork,
+      () => fetchClaimsFromNetwork(options),
       options,
     )
-    const unread = claims.filter((listing) => !listing.claimed_seen_at).length
-    cache.setCached(ADMIN_CACHE_KEYS.claimsUnread, unread)
+    cache.setCached(ADMIN_CACHE_KEYS.claimsUnread, unreadClaimCount(claims))
     return claims
   }
 
@@ -49,18 +59,16 @@ export function useAdminClaims() {
     return cache.swr(
       ADMIN_CACHE_KEYS.claimsUnread,
       ADMIN_CACHE_TTL_MS.claimsUnread,
-      async () => {
-        const claims = await fetchClaims(options)
-        return claims.filter((listing) => !listing.claimed_seen_at).length
-      },
+      async () => unreadClaimCount(await fetchClaims(options)),
       options,
     )
   }
 
-  async function markClaimsSeen(): Promise<void> {
+  async function markClaimsSeen(): Promise<Listing[]> {
+    const seenAt = new Date().toISOString()
     const { error } = await supabase
       .from('listings')
-      .update({ claimed_seen_at: new Date().toISOString() })
+      .update({ claimed_seen_at: seenAt })
       .eq('status', 'claimed')
       .is('claimed_seen_at', null)
 
@@ -68,10 +76,21 @@ export function useAdminClaims() {
       throw new Error(error.message)
     }
 
-    cache.invalidate(ADMIN_CACHE_KEYS.claims)
-    cache.invalidate(ADMIN_CACHE_KEYS.claimsUnread)
-    cache.invalidate(ADMIN_CACHE_KEYS.listings)
+    const current = peekClaims() ?? []
+    const nextClaims = stampClaimsSeen(current, seenAt)
+    cache.setCached(ADMIN_CACHE_KEYS.claims, nextClaims)
     cache.setCached(ADMIN_CACHE_KEYS.claimsUnread, 0)
+
+    const all = peekAllListings()
+    if (all) {
+      const nextAll = stampClaimsSeen(all, seenAt)
+      cache.setCached(ADMIN_CACHE_KEYS.listings, nextAll)
+      for (const listing of nextAll) {
+        cache.setCached(ADMIN_CACHE_KEYS.listing(listing.id), listing)
+      }
+    }
+
+    return nextClaims
   }
 
   return {

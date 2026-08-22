@@ -21,13 +21,13 @@ const { fetchUnreadCount, peekUnreadCount } = useAdminClaims()
 const unreadClaims = ref(peekUnreadCount() ?? 0)
 const { listingsTick } = useRealtimeTicks()
 
-async function loadUnread() {
+async function loadUnread(force = false) {
   if (profile.value?.role !== 'admin') {
     unreadClaims.value = 0
     return
   }
   try {
-    unreadClaims.value = await fetchUnreadCount({ force: true })
+    unreadClaims.value = await fetchUnreadCount({ force })
   } catch {
     unreadClaims.value = peekUnreadCount() ?? 0
   }
@@ -38,12 +38,21 @@ onMounted(() => {
 })
 
 watch(listingsTick, () => {
-  void loadUnread()
+  void loadUnread(true)
 })
 
 watch(() => profile.value?.role, () => {
   void loadUnread()
 })
+
+watch(
+  () => peekUnreadCount(),
+  (next) => {
+    if (profile.value?.role === 'admin' && next != null) {
+      unreadClaims.value = next
+    }
+  },
+)
 
 function badgeFor(item: InsideNavItem) {
   if (item.badge === 'claims' && unreadClaims.value > 0) {
