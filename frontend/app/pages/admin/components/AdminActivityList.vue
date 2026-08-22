@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Listing } from '@/types/listings'
 import { LISTING_STATUS_LABELS } from '@/types/listings'
-import { formatPeso } from '@/utils/listings/format'
+import { formatListingDate, formatPeso } from '@/utils/listings/format'
 
 defineProps<{
   listings: Listing[]
@@ -41,7 +41,7 @@ defineProps<{
           <ActivityStatusBadge :status="listing.status" class="mt-1.5" />
         </div>
         <p class="text-xs text-muted-foreground">
-          {{ new Date(listing.created_at).toLocaleDateString() }}
+          {{ formatListingDate(listing.created_at) }}
         </p>
       </div>
       <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">

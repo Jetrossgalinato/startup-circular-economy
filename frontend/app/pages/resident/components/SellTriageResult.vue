@@ -64,6 +64,11 @@ watch(
       completeTimer = null
     }
 
+    if (import.meta.server) {
+      showResult.value = !loading
+      return
+    }
+
     if (loading) {
       startRamp()
       return

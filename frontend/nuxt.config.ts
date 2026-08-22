@@ -6,6 +6,16 @@ const env = loadEnv('', '.', '')
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  // Session is in localStorage; SSR HTML would never match the hydrated auth UI.
+  ssr: false,
+  routeRules: {
+    '/resident': { ssr: false },
+    '/resident/**': { ssr: false },
+    '/admin': { ssr: false },
+    '/admin/**': { ssr: false },
+    '/collector': { ssr: false },
+    '/collector/**': { ssr: false },
+  },
   runtimeConfig: {
     cursorApiKey: env.CURSOR_API_KEY || '',
     public: {

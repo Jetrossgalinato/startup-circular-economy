@@ -16,3 +16,14 @@ export function formatRatePerKg(rate: number | null | undefined) {
   }
   return `${formatPeso(rate)} / kg`
 }
+
+export function formatListingDate(iso: string | null | undefined) {
+  if (!iso) {
+    return '—'
+  }
+  return new Intl.DateTimeFormat('en-PH', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  }).format(new Date(iso))
+}
