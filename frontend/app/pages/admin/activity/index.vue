@@ -7,16 +7,23 @@ definePageMeta({
   role: 'admin',
 })
 
-const { fetchAllListings } = useAdminListings()
-const listings = ref<Listing[]>([])
-const loading = ref(true)
+const { fetchAllListings, peekAllListings } = useAdminListings()
+const listings = ref<Listing[]>(peekAllListings() ?? [])
+const loading = ref(listings.value.length === 0 && peekAllListings() === null)
 const { listingsTick } = useRealtimeTicks()
 
-async function loadActivity() {
+async function loadActivity(force = false) {
+  const hadCache = peekAllListings() !== null
+  if (!hadCache) {
+    loading.value = true
+  }
+
   try {
-    listings.value = await fetchAllListings()
+    listings.value = await fetchAllListings({ force })
   } catch {
-    listings.value = []
+    if (!hadCache) {
+      listings.value = []
+    }
   } finally {
     loading.value = false
   }
@@ -25,7 +32,7 @@ async function loadActivity() {
 onMounted(() => loadActivity())
 
 watch(listingsTick, () => {
-  void loadActivity()
+  void loadActivity(true)
 })
 </script>
 

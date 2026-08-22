@@ -4,17 +4,22 @@ import type { RateCardCategory } from '@/types/listings'
 import { AUTH_INPUT_CLASS } from '@/constants/auth'
 import { formatRatePerKg } from '@/utils/listings/format'
 
-const { fetchAllCategories, updateCategory } = useRateCard()
+const { fetchAllCategories, peekAllCategories, updateCategory } = useRateCard()
 const { rateCardTick } = useRealtimeTicks()
 
-const categories = ref<RateCardCategory[]>([])
-const drafts = ref<Record<string, string>>({})
-const loading = ref(true)
+const peeked = peekAllCategories()
+const categories = ref<RateCardCategory[]>(peeked ?? [])
+const drafts = ref<Record<string, string>>(
+  peeked
+    ? Object.fromEntries(peeked.map((row) => [row.code, String(row.rate_per_kg)]))
+    : {},
+)
+const loading = ref(peeked === null)
 const savingCode = ref<string | null>(null)
 
-async function loadRates(showError = true) {
+async function loadRates(showError = true, force = false) {
   try {
-    const rows = await fetchAllCategories()
+    const rows = await fetchAllCategories({ force })
     categories.value = rows
     drafts.value = Object.fromEntries(
       rows.map((row) => [row.code, String(row.rate_per_kg)]),
@@ -36,7 +41,7 @@ watch(rateCardTick, () => {
   if (savingCode.value) {
     return
   }
-  void loadRates(false)
+  void loadRates(false, true)
 })
 
 function isDirty(category: RateCardCategory) {

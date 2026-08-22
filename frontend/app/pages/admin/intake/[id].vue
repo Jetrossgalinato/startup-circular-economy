@@ -10,14 +10,14 @@ definePageMeta({
 
 const route = useRoute()
 const listingId = computed(() => String(route.params.id))
-const { fetchListing } = useAdminListings()
-const listing = ref<Listing | null>(null)
-const loading = ref(true)
+const { fetchListing, peekListing } = useAdminListings()
+const listing = ref<Listing | null>(peekListing(listingId.value))
+const loading = ref(listing.value == null)
 const { listingsTick } = useRealtimeTicks()
 
-async function loadListing(showError = true) {
+async function loadListing(showError = true, force = false) {
   try {
-    listing.value = await fetchListing(listingId.value)
+    listing.value = await fetchListing(listingId.value, { force })
     if (!listing.value && showError) {
       toast.error('Listing not found', {
         description: 'It may have been cancelled or already processed.',
@@ -38,7 +38,7 @@ async function loadListing(showError = true) {
 onMounted(() => loadListing())
 
 watch(listingsTick, () => {
-  void loadListing(false)
+  void loadListing(false, true)
 })
 
 async function onCompleted() {

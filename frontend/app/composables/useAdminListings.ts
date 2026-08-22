@@ -3,9 +3,14 @@ import {
   type HazardTier,
   type Listing,
   type ListingCondition,
-  type ListingStatus,
   type PayoutMethod,
+  type ListingStatus,
 } from '@/types/listings'
+import {
+  ADMIN_CACHE_KEYS,
+  ADMIN_CACHE_TTL_MS,
+  type AdminCacheFetchOptions,
+} from '@/constants/admin/cache'
 
 const ADMIN_LISTING_SELECT = `
   id,
@@ -85,9 +90,63 @@ export type CompleteIntakeInput = {
 
 export function useAdminListings() {
   const supabase = useSupabase()
+  const cache = useResidentCache()
   const { writeListingThrough, invalidateListings } = useListings()
 
-  async function fetchListing(id: string): Promise<Listing | null> {
+  function peekOpsSummary(): AdminOpsSummary | null {
+    return cache.getCached<AdminOpsSummary>(ADMIN_CACHE_KEYS.opsSummary)?.data ?? null
+  }
+
+  function peekIntakeQueue(): Listing[] | null {
+    return cache.getCached<Listing[]>(ADMIN_CACHE_KEYS.intakeQueue)?.data ?? null
+  }
+
+  function peekAllListings(): Listing[] | null {
+    return cache.getCached<Listing[]>(ADMIN_CACHE_KEYS.listings)?.data ?? null
+  }
+
+  function peekListing(id: string): Listing | null {
+    return cache.getCached<Listing>(ADMIN_CACHE_KEYS.listing(id))?.data ?? null
+  }
+
+  function writeAdminListingThrough(listing: Listing) {
+    cache.setCached(ADMIN_CACHE_KEYS.listing(listing.id), listing)
+
+    const queue = peekIntakeQueue()
+    if (queue) {
+      const without = queue.filter((item) => item.id !== listing.id)
+      cache.setCached(
+        ADMIN_CACHE_KEYS.intakeQueue,
+        listing.status === 'pickup_scheduled'
+          ? [...without, listing].sort(
+              (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+            )
+          : without,
+      )
+    }
+
+    const all = peekAllListings()
+    if (all) {
+      const without = all.filter((item) => item.id !== listing.id)
+      cache.setCached(
+        ADMIN_CACHE_KEYS.listings,
+        [listing, ...without].sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        ),
+      )
+    }
+
+    cache.invalidate(ADMIN_CACHE_KEYS.opsSummary)
+  }
+
+  function invalidateAdminListings() {
+    cache.invalidate(ADMIN_CACHE_KEYS.opsSummary)
+    cache.invalidate(ADMIN_CACHE_KEYS.intakeQueue)
+    cache.invalidate(ADMIN_CACHE_KEYS.listings)
+    cache.invalidate(ADMIN_CACHE_KEYS.listingPrefix)
+  }
+
+  async function fetchListingFromNetwork(id: string): Promise<Listing | null> {
     const { data, error } = await supabase
       .from('listings')
       .select(ADMIN_LISTING_SELECT)
@@ -101,7 +160,19 @@ export function useAdminListings() {
     return data ? normalizeAdminListing(data as Record<string, unknown>) : null
   }
 
-  async function fetchIntakeQueue(): Promise<Listing[]> {
+  async function fetchListing(
+    id: string,
+    options: AdminCacheFetchOptions = {},
+  ): Promise<Listing | null> {
+    return cache.swr(
+      ADMIN_CACHE_KEYS.listing(id),
+      ADMIN_CACHE_TTL_MS.listing,
+      () => fetchListingFromNetwork(id),
+      options,
+    )
+  }
+
+  async function fetchIntakeQueueFromNetwork(): Promise<Listing[]> {
     const { data, error } = await supabase
       .from('listings')
       .select(ADMIN_LISTING_SELECT)
@@ -112,10 +183,25 @@ export function useAdminListings() {
       throw new Error(error.message)
     }
 
-    return (data ?? []).map((row) => normalizeAdminListing(row as Record<string, unknown>))
+    const listings = (data ?? []).map((row) => normalizeAdminListing(row as Record<string, unknown>))
+    for (const listing of listings) {
+      cache.setCached(ADMIN_CACHE_KEYS.listing(listing.id), listing)
+    }
+    return listings
   }
 
-  async function fetchAllListings(): Promise<Listing[]> {
+  async function fetchIntakeQueue(
+    options: AdminCacheFetchOptions = {},
+  ): Promise<Listing[]> {
+    return cache.swr(
+      ADMIN_CACHE_KEYS.intakeQueue,
+      ADMIN_CACHE_TTL_MS.intakeQueue,
+      fetchIntakeQueueFromNetwork,
+      options,
+    )
+  }
+
+  async function fetchAllListingsFromNetwork(): Promise<Listing[]> {
     const { data, error } = await supabase
       .from('listings')
       .select(ADMIN_LISTING_SELECT)
@@ -125,10 +211,25 @@ export function useAdminListings() {
       throw new Error(error.message)
     }
 
-    return (data ?? []).map((row) => normalizeAdminListing(row as Record<string, unknown>))
+    const listings = (data ?? []).map((row) => normalizeAdminListing(row as Record<string, unknown>))
+    for (const listing of listings) {
+      cache.setCached(ADMIN_CACHE_KEYS.listing(listing.id), listing)
+    }
+    return listings
   }
 
-  async function fetchOpsSummary(): Promise<AdminOpsSummary> {
+  async function fetchAllListings(
+    options: AdminCacheFetchOptions = {},
+  ): Promise<Listing[]> {
+    return cache.swr(
+      ADMIN_CACHE_KEYS.listings,
+      ADMIN_CACHE_TTL_MS.listings,
+      fetchAllListingsFromNetwork,
+      options,
+    )
+  }
+
+  async function fetchOpsSummaryFromNetwork(): Promise<AdminOpsSummary> {
     const startOfToday = new Date()
     startOfToday.setHours(0, 0, 0, 0)
 
@@ -153,6 +254,17 @@ export function useAdminListings() {
     }
   }
 
+  async function fetchOpsSummary(
+    options: AdminCacheFetchOptions = {},
+  ): Promise<AdminOpsSummary> {
+    return cache.swr(
+      ADMIN_CACHE_KEYS.opsSummary,
+      ADMIN_CACHE_TTL_MS.opsSummary,
+      fetchOpsSummaryFromNetwork,
+      options,
+    )
+  }
+
   async function completeIntake(id: string, input: CompleteIntakeInput): Promise<Listing> {
     if (input.hazardTier === 4) {
       const { data, error } = await supabase
@@ -173,6 +285,7 @@ export function useAdminListings() {
       const listing = normalizeAdminListing(data as Record<string, unknown>)
       writeListingThrough(listing)
       invalidateListings()
+      writeAdminListingThrough(listing)
       return listing
     }
 
@@ -203,6 +316,7 @@ export function useAdminListings() {
     const listing = normalizeAdminListing(data as Record<string, unknown>)
     writeListingThrough(listing)
     invalidateListings()
+    writeAdminListingThrough(listing)
     return listing
   }
 
@@ -212,5 +326,10 @@ export function useAdminListings() {
     fetchAllListings,
     fetchOpsSummary,
     completeIntake,
+    peekOpsSummary,
+    peekIntakeQueue,
+    peekAllListings,
+    peekListing,
+    invalidateAdminListings,
   }
 }

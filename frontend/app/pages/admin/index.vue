@@ -9,19 +9,26 @@ definePageMeta({
 })
 
 const { profile } = useAuth()
-const { fetchOpsSummary } = useAdminListings()
+const { fetchOpsSummary, peekOpsSummary } = useAdminListings()
 const { fetchCategories, peekCategories } = useRateCard()
-
-const summary = ref<AdminOpsSummary>({ scheduled: 0, weighed: 0, paidToday: 0 })
-const categories = ref<RateCardCategory[]>(peekCategories() ?? [])
-const loading = ref(true)
 const { listingsTick, rateCardTick } = useRealtimeTicks()
 
-async function loadHome() {
+const summary = ref<AdminOpsSummary>(
+  peekOpsSummary() ?? { scheduled: 0, weighed: 0, paidToday: 0 },
+)
+const categories = ref<RateCardCategory[]>(peekCategories() ?? [])
+const loading = ref(peekOpsSummary() === null)
+
+async function loadHome(force = false) {
+  const hadCache = peekOpsSummary() !== null
+  if (!hadCache) {
+    loading.value = true
+  }
+
   try {
     const [nextSummary, nextCategories] = await Promise.all([
-      fetchOpsSummary(),
-      fetchCategories({ force: true }),
+      fetchOpsSummary({ force }),
+      fetchCategories({ force }),
     ])
     summary.value = nextSummary
     categories.value = nextCategories
@@ -35,7 +42,7 @@ async function loadHome() {
 onMounted(() => loadHome())
 
 watch(listingsTick, () => {
-  void fetchOpsSummary().then((next) => {
+  void fetchOpsSummary({ force: true }).then((next) => {
     summary.value = next
   }).catch(() => {})
 })
