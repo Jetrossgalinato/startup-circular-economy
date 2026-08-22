@@ -12,6 +12,8 @@ const tone = computed(() => {
   switch (props.status) {
     case 'paid':
       return 'bg-emerald-100 text-emerald-900'
+    case 'claimed':
+      return 'bg-[#dce8ee] text-foreground'
     case 'refused':
     case 'cancelled':
       return 'bg-red-100 text-red-900'

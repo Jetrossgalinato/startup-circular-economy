@@ -6,8 +6,11 @@ export type ListingStatus =
   | 'pickup_scheduled'
   | 'weighed'
   | 'paid'
+  | 'claimed'
   | 'refused'
   | 'cancelled'
+
+export type FulfillmentMethod = 'pickup' | 'delivery'
 
 export type PayoutMethod = 'gcash' | 'cash'
 
@@ -68,6 +71,10 @@ export type Listing = {
   cancellation_reason: string | null
   cancelled_at: string | null
   resale_eligible: boolean
+  claimed_by: string | null
+  claimed_at: string | null
+  fulfillment_method: FulfillmentMethod | null
+  delivery_address: string | null
   created_at: string
   updated_at: string
   listing_photos?: ListingPhoto[]
@@ -115,8 +122,14 @@ export const LISTING_STATUS_LABELS: Record<ListingStatus, string> = {
   pickup_scheduled: 'Pickup scheduled',
   weighed: 'Weighed — payout pending',
   paid: 'Paid',
+  claimed: 'Claimed',
   refused: 'Intake refused',
   cancelled: 'Cancelled',
+}
+
+export const FULFILLMENT_LABELS: Record<FulfillmentMethod, string> = {
+  pickup: 'Pickup at cross-dock',
+  delivery: 'Delivery',
 }
 
 /** Residents can cancel before logistics weigh-in or payout. */

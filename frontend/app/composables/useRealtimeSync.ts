@@ -1,6 +1,7 @@
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { RESIDENT_CACHE_KEYS } from '@/constants/resident/cache'
 import { ADMIN_CACHE_KEYS } from '@/constants/admin/cache'
+import { COLLECTOR_CACHE_KEYS } from '@/constants/collector/cache'
 
 const LISTINGS_TICK_KEY = 'realtime-listings-tick'
 const RATE_CARD_TICK_KEY = 'realtime-rate-card-tick'
@@ -30,6 +31,9 @@ export function useRealtimeSync() {
     cache.invalidate(ADMIN_CACHE_KEYS.intakeQueue)
     cache.invalidate(ADMIN_CACHE_KEYS.listings)
     cache.invalidate(ADMIN_CACHE_KEYS.listingPrefix)
+    cache.invalidate(COLLECTOR_CACHE_KEYS.catalog)
+    cache.invalidate(COLLECTOR_CACHE_KEYS.orders)
+    cache.invalidate(COLLECTOR_CACHE_KEYS.listingPrefix)
     listingsTick.value += 1
   }
 
