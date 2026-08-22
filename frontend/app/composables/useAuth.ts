@@ -3,6 +3,8 @@ import { AUTH_STATE_KEYS } from '@/constants/auth'
 import type { Profile, SignInInput, SignUpInput } from '@/types/auth'
 import { getRoleHomeRoute, mapAuthError } from '@/utils/auth'
 
+let initAuthPromise: Promise<void> | null = null
+
 export function useAuth() {
   const supabase = useSupabase()
   const user = useState<User | null>(AUTH_STATE_KEYS.user, () => null)
@@ -73,19 +75,28 @@ export function useAuth() {
       return
     }
 
-    initialized.value = true
+    if (!initAuthPromise) {
+      initAuthPromise = (async () => {
+        const { data, error } = await supabase.auth.getSession()
 
-    const { data, error } = await supabase.auth.getSession()
+        if (error) {
+          throw new Error(error.message)
+        }
 
-    if (error) {
-      throw new Error(error.message)
+        await setSession(data.session)
+
+        supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+          await setSession(nextSession)
+        })
+
+        initialized.value = true
+      })().catch((error) => {
+        initAuthPromise = null
+        throw error
+      })
     }
 
-    await setSession(data.session)
-
-    supabase.auth.onAuthStateChange(async (_event, nextSession) => {
-      await setSession(nextSession)
-    })
+    await initAuthPromise
   }
 
   async function signUp({ email, password, fullName, role }: SignUpInput) {
