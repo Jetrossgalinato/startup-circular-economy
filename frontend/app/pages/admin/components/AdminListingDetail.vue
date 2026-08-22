@@ -1,0 +1,106 @@
+<script setup lang="ts">
+import type { Listing } from '@/types/listings'
+import { formatPeso, formatRatePerKg } from '@/utils/listings/format'
+
+const props = defineProps<{
+  listing: Listing
+}>()
+
+const { getSignedUrls } = useListingUpload()
+const photos = ref(props.listing.listing_photos ?? [])
+
+onMounted(async () => {
+  try {
+    photos.value = await getSignedUrls(props.listing.listing_photos ?? [])
+  } catch {
+    photos.value = props.listing.listing_photos ?? []
+  }
+})
+</script>
+
+<template>
+  <div class="space-y-4">
+    <div class="rounded-[1.5rem] border border-neutral-200 p-5">
+      <p class="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+        Listing
+      </p>
+      <h2 class="mt-1 text-xl font-bold tracking-tight">
+        {{ listing.rate_card_categories?.name || listing.category_code || 'Item' }}
+      </h2>
+      <ActivityStatusBadge :status="listing.status" class="mt-2" />
+    </div>
+
+    <div
+      v-if="photos.some((photo) => photo.signed_url)"
+      class="flex gap-2 overflow-x-auto"
+    >
+      <img
+        v-for="photo in photos"
+        :key="photo.id"
+        :src="photo.signed_url"
+        alt="Listing photo"
+        class="h-24 w-24 shrink-0 rounded-2xl object-cover"
+      >
+    </div>
+
+    <div class="grid gap-3 sm:grid-cols-2">
+      <div class="rounded-2xl bg-neutral-50 p-4">
+        <p class="text-xs text-muted-foreground">Hazard tier</p>
+        <p class="mt-1 text-lg font-semibold">
+          {{ listing.hazard_tier ? `Tier ${listing.hazard_tier}` : '—' }}
+        </p>
+      </div>
+      <div class="rounded-2xl bg-neutral-50 p-4">
+        <p class="text-xs text-muted-foreground">Resale</p>
+        <p class="mt-1 text-lg font-semibold">
+          {{ listing.resale_eligible ? 'Collector stock' : 'Not listed' }}
+        </p>
+      </div>
+      <div class="rounded-2xl bg-neutral-50 p-4">
+        <p class="text-xs text-muted-foreground">Weight</p>
+        <p class="mt-1 text-lg font-semibold">
+          {{ listing.weight_kg != null ? `${listing.weight_kg} kg` : 'Pending weigh-in' }}
+        </p>
+      </div>
+      <div class="rounded-2xl bg-neutral-50 p-4">
+        <p class="text-xs text-muted-foreground">Payout</p>
+        <p class="mt-1 text-lg font-semibold">
+          {{ listing.final_amount != null ? formatPeso(listing.final_amount) : 'After weigh-in' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-neutral-200 p-4">
+      <p class="text-sm font-semibold">Resident (admin only)</p>
+      <p class="mt-1 text-sm text-foreground">
+        {{ listing.resident?.full_name || '—' }}
+      </p>
+      <p v-if="listing.resident?.phone" class="text-sm text-muted-foreground">
+        {{ listing.resident.phone }}
+      </p>
+      <p class="mt-2 text-sm text-foreground/80 whitespace-pre-wrap">
+        {{ listing.pickup_address || listing.resident?.address || 'No pickup address' }}
+      </p>
+      <p class="mt-2 text-sm text-muted-foreground capitalize">
+        Payout: {{ listing.payout_method || '—' }}
+        <template v-if="listing.payout_method === 'gcash' && listing.gcash_number">
+          · {{ listing.gcash_number }}
+        </template>
+      </p>
+      <p class="mt-1 text-sm text-muted-foreground">
+        Rate: {{ formatRatePerKg(listing.quoted_rate_per_kg) }}
+      </p>
+    </div>
+
+    <Button
+      v-if="listing.status === 'pickup_scheduled'"
+      as-child
+      size="lg"
+      class="h-11 w-full rounded-full bg-foreground text-white hover:bg-foreground/90"
+    >
+      <NuxtLink :to="`/admin/intake/${listing.id}`">
+        Open intake
+      </NuxtLink>
+    </Button>
+  </div>
+</template>

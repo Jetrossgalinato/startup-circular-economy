@@ -67,10 +67,17 @@ export type Listing = {
   final_amount: number | null
   cancellation_reason: string | null
   cancelled_at: string | null
+  resale_eligible: boolean
   created_at: string
   updated_at: string
   listing_photos?: ListingPhoto[]
   rate_card_categories?: Pick<RateCardCategory, 'code' | 'name' | 'rate_per_kg'> | null
+  resident?: {
+    id: string
+    full_name: string
+    phone: string | null
+    address: string | null
+  } | null
 }
 
 export type HazardTriageResult = {
