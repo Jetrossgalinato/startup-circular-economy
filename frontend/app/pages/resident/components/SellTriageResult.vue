@@ -71,7 +71,7 @@ function startRamp() {
   }, 40)
   statusTimer = setInterval(() => {
     statusIndex.value = (statusIndex.value + 1) % STATUS_MESSAGES.length
-  }, 1400)
+  }, 4500)
 }
 
 watch(
