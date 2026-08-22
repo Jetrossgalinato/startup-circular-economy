@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Listing } from '@/types/listings'
+import type { Listing, ListingStatus } from '@/types/listings'
 
 definePageMeta({
   layout: 'resident',
@@ -11,6 +11,24 @@ const { fetchMyListings, peekListings } = useListings()
 const listings = ref<Listing[]>(peekListings() ?? [])
 const loading = ref(listings.value.length === 0 && peekListings() === null)
 const { listingsTick } = useRealtimeTicks()
+
+const statusFilter = ref<ListingStatus | 'all'>('all')
+const categoryFilter = ref('all')
+
+const filteredListings = computed(() => {
+  return listings.value.filter((listing) => {
+    if (statusFilter.value !== 'all' && listing.status !== statusFilter.value) {
+      return false
+    }
+
+    const categoryCode = listing.category_code || 'uncategorized'
+    if (categoryFilter.value !== 'all' && categoryCode !== categoryFilter.value) {
+      return false
+    }
+
+    return true
+  })
+})
 
 async function loadListings(force = false) {
   const hadCache = peekListings() !== null
@@ -45,12 +63,18 @@ watch(listingsTick, () => {
     <h1 class="text-3xl font-bold tracking-tight">
       Activity
     </h1>
-    <p class="mt-1.5 mb-6 text-sm text-muted-foreground">
+    <p class="mt-1.5 mb-4 text-sm text-muted-foreground">
       Track sell requests, pickups, weigh-in, and payouts.
     </p>
-    <ActivityList
+    <ActivityFilters
+      v-model:status="statusFilter"
+      v-model:category="categoryFilter"
       :listings="listings"
+    />
+    <ActivityList
+      :listings="filteredListings"
       :loading="loading"
+      :has-any-listings="listings.length > 0"
       @cancelled="onCancelled"
     />
   </div>
