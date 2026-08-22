@@ -93,6 +93,33 @@ watch(listingsTick, () => {
       </NuxtLink>
     </Button>
 
+    <div>
+      <div class="mb-3 flex items-center justify-between">
+        <h2 class="text-sm font-semibold">Available now</h2>
+        <NuxtLink to="/collector/browse" class="text-sm text-muted-foreground underline underline-offset-2">
+          See all
+        </NuxtLink>
+      </div>
+      <p v-if="loading && catalog.length === 0" class="text-sm text-muted-foreground">
+        Loading stock…
+      </p>
+      <p
+        v-else-if="catalog.length === 0"
+        class="rounded-2xl border border-dashed border-neutral-300 px-4 py-6 text-center text-sm text-muted-foreground"
+      >
+        No lots yet. New stock appears after admin payout.
+      </p>
+      <div v-else class="space-y-2">
+        <NuxtLink
+          v-for="listing in catalog.slice(0, 3)"
+          :key="listing.id"
+          :to="`/collector/browse/${listing.id}`"
+        >
+          <CollectorStockCard :listing="listing" />
+        </NuxtLink>
+      </div>
+    </div>
+
     <div v-if="orders.length">
       <div class="mb-3 flex items-center justify-between">
         <h2 class="text-sm font-semibold">Recent claims</h2>
@@ -108,6 +135,25 @@ watch(listingsTick, () => {
         >
           <CollectorStockCard :listing="listing" />
         </NuxtLink>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="rounded-[1.5rem] border border-neutral-200 p-4">
+        <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
+          PICKUP
+        </p>
+        <p class="mt-1 text-sm font-medium leading-5">
+          Collect at the Butuan cross-dock
+        </p>
+      </div>
+      <div class="rounded-[1.5rem] border border-neutral-200 p-4">
+        <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
+          DELIVERY
+        </p>
+        <p class="mt-1 text-sm font-medium leading-5">
+          Send to the address on your profile
+        </p>
       </div>
     </div>
   </div>
