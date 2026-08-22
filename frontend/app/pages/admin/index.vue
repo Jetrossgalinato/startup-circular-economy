@@ -100,7 +100,7 @@ watch(rateCardTick, () => {
         Unseen collector claims
       </p>
     </NuxtLink>
-
+    
     <div class="grid grid-cols-2 gap-3">
       <NuxtLink
         to="/admin/activity"

@@ -8,6 +8,7 @@ import { claimBadgeLabel } from '@/utils/listings/claims'
 defineProps<{
   listings: Listing[]
   loading?: boolean
+  hasAnyListings?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -62,6 +63,15 @@ async function confirmCancel(reason: string) {
       class="rounded-2xl border border-neutral-200 px-4 py-8 text-center text-sm text-muted-foreground"
     >
       Loading activity…
+    </div>
+    <div
+      v-else-if="listings.length === 0 && hasAnyListings"
+      class="rounded-2xl border border-dashed border-neutral-300 px-4 py-10 text-center"
+    >
+      <p class="font-medium">No matching listings</p>
+      <p class="mt-1 text-sm text-muted-foreground">
+        Try another status or category.
+      </p>
     </div>
     <div
       v-else-if="listings.length === 0"
