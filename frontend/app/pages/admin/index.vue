@@ -10,6 +10,7 @@ definePageMeta({
 
 const { profile } = useAuth()
 const { fetchOpsSummary, peekOpsSummary } = useAdminListings()
+const { fetchUnreadCount, peekUnreadCount } = useAdminClaims()
 const { fetchCategories, peekCategories } = useRateCard()
 const { listingsTick, rateCardTick } = useRealtimeTicks()
 
@@ -17,6 +18,7 @@ const summary = ref<AdminOpsSummary>(
   peekOpsSummary() ?? { scheduled: 0, weighed: 0, paidToday: 0 },
 )
 const categories = ref<RateCardCategory[]>(peekCategories() ?? [])
+const unreadClaims = ref(peekUnreadCount() ?? 0)
 const loading = ref(peekOpsSummary() === null)
 
 async function loadHome(force = false) {
@@ -26,12 +28,14 @@ async function loadHome(force = false) {
   }
 
   try {
-    const [nextSummary, nextCategories] = await Promise.all([
+    const [nextSummary, nextCategories, nextUnread] = await Promise.all([
       fetchOpsSummary({ force }),
       fetchCategories({ force }),
+      fetchUnreadCount({ force }),
     ])
     summary.value = nextSummary
     categories.value = nextCategories
+    unreadClaims.value = nextUnread
   } catch {
     // Keep zeros / peeked rate card
   } finally {
@@ -44,6 +48,9 @@ onMounted(() => loadHome())
 watch(listingsTick, () => {
   void fetchOpsSummary({ force: true }).then((next) => {
     summary.value = next
+  }).catch(() => {})
+  void fetchUnreadCount({ force: true }).then((next) => {
+    unreadClaims.value = next
   }).catch(() => {})
 })
 
@@ -78,6 +85,21 @@ watch(rateCardTick, () => {
         Open intake queue
       </NuxtLink>
     </Button>
+
+    <NuxtLink
+      to="/admin/claims"
+      class="block rounded-[1.5rem] bg-[#ead9c4] p-4 transition hover:opacity-90"
+    >
+      <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
+        CLAIMS
+      </p>
+      <p class="mt-1 text-3xl font-bold tracking-tight">
+        {{ unreadClaims }}
+      </p>
+      <p class="mt-0.5 text-sm text-foreground/70">
+        Unseen collector claims
+      </p>
+    </NuxtLink>
 
     <div class="grid grid-cols-2 gap-3">
       <NuxtLink

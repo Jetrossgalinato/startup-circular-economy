@@ -75,6 +75,7 @@ export type Listing = {
   claimed_at: string | null
   fulfillment_method: FulfillmentMethod | null
   delivery_address: string | null
+  claimed_seen_at: string | null
   created_at: string
   updated_at: string
   listing_photos?: ListingPhoto[]

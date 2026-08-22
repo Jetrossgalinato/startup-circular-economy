@@ -1,4 +1,5 @@
-import type { RealtimeChannel } from '@supabase/supabase-js'
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+import { toast } from 'vue-sonner'
 import { RESIDENT_CACHE_KEYS } from '@/constants/resident/cache'
 import { ADMIN_CACHE_KEYS } from '@/constants/admin/cache'
 import { COLLECTOR_CACHE_KEYS } from '@/constants/collector/cache'
@@ -18,7 +19,7 @@ export function useRealtimeTicks() {
  */
 export function useRealtimeSync() {
   const supabase = useSupabase()
-  const { session } = useAuth()
+  const { session, profile } = useAuth()
   const cache = useResidentCache()
   const { listingsTick, rateCardTick } = useRealtimeTicks()
 
@@ -34,7 +35,27 @@ export function useRealtimeSync() {
     cache.invalidate(COLLECTOR_CACHE_KEYS.catalog)
     cache.invalidate(COLLECTOR_CACHE_KEYS.orders)
     cache.invalidate(COLLECTOR_CACHE_KEYS.listingPrefix)
+    cache.invalidate(ADMIN_CACHE_KEYS.claims)
+    cache.invalidate(ADMIN_CACHE_KEYS.claimsUnread)
     listingsTick.value += 1
+  }
+
+  function onListingChange(payload: RealtimePostgresChangesPayload<Record<string, unknown>>) {
+    bumpListings()
+
+    const next = payload.new as { status?: string, fulfillment_method?: string } | undefined
+    const prev = payload.old as { status?: string } | undefined
+    if (
+      profile.value?.role === 'admin'
+      && next?.status === 'claimed'
+      && prev?.status !== 'claimed'
+    ) {
+      toast.success('New collector claim', {
+        description: next.fulfillment_method === 'delivery'
+          ? 'Collector requested delivery.'
+          : 'Collector will pick up at the cross-dock.',
+      })
+    }
   }
 
   function bumpRateCard() {
@@ -60,8 +81,8 @@ export function useRealtimeSync() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'listings' },
-        () => {
-          bumpListings()
+        (payload) => {
+          onListingChange(payload)
         },
       )
       .on(

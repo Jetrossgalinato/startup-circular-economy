@@ -5,6 +5,8 @@ export const ADMIN_CACHE_KEYS = {
   listing: (id: string) => `admin-listing:${id}`,
   listingPrefix: 'admin-listing:',
   rateCardAll: 'admin-rate-card-all',
+  claims: 'admin-claims',
+  claimsUnread: 'admin-claims-unread',
 } as const
 
 export const ADMIN_CACHE_TTL_MS = {
@@ -13,6 +15,8 @@ export const ADMIN_CACHE_TTL_MS = {
   listings: 30 * 1000,
   listing: 30 * 1000,
   rateCardAll: 10 * 60 * 1000,
+  claims: 30 * 1000,
+  claimsUnread: 15 * 1000,
 } as const
 
 export type AdminCacheFetchOptions = {

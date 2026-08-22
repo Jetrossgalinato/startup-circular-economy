@@ -17,6 +17,41 @@ const navItems = computed((): InsideNavItem[] =>
   props.items ?? getNavItemsForRole(profile.value?.role),
 )
 
+const { fetchUnreadCount, peekUnreadCount } = useAdminClaims()
+const unreadClaims = ref(peekUnreadCount() ?? 0)
+const { listingsTick } = useRealtimeTicks()
+
+async function loadUnread() {
+  if (profile.value?.role !== 'admin') {
+    unreadClaims.value = 0
+    return
+  }
+  try {
+    unreadClaims.value = await fetchUnreadCount({ force: true })
+  } catch {
+    unreadClaims.value = peekUnreadCount() ?? 0
+  }
+}
+
+onMounted(() => {
+  void loadUnread()
+})
+
+watch(listingsTick, () => {
+  void loadUnread()
+})
+
+watch(() => profile.value?.role, () => {
+  void loadUnread()
+})
+
+function badgeFor(item: InsideNavItem) {
+  if (item.badge === 'claims' && unreadClaims.value > 0) {
+    return unreadClaims.value > 9 ? '9+' : String(unreadClaims.value)
+  }
+  return null
+}
+
 const trackRef = ref<HTMLElement | null>(null)
 const linkRefs = ref<(HTMLElement | null)[]>([])
 
@@ -104,17 +139,26 @@ onBeforeUnmount(() => {
         :key="item.to"
         :ref="(el) => setLinkRef(el, index)"
         :to="item.to"
-        class="relative z-10 flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full px-2 py-2 text-[10px] font-medium transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none sm:text-xs"
+        class="relative z-10 flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full px-1.5 py-2 text-[10px] font-medium transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none sm:px-2 sm:text-xs"
         :class="isActive(item)
           ? 'text-white'
           : 'text-foreground/55 hover:text-foreground'"
       >
-        <component
-          :is="item.icon"
-          class="size-5 transition-[transform,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
-          :class="isActive(item) ? 'scale-110' : 'scale-100'"
-          :stroke-width="isActive(item) ? 2.25 : 1.75"
-        />
+        <span class="relative">
+          <component
+            :is="item.icon"
+            class="size-5 transition-[transform,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+            :class="isActive(item) ? 'scale-110' : 'scale-100'"
+            :stroke-width="isActive(item) ? 2.25 : 1.75"
+          />
+          <span
+            v-if="badgeFor(item)"
+            class="absolute -top-1.5 -right-2 min-w-4 rounded-full px-1 text-center text-[9px] font-bold leading-4"
+            :class="isActive(item) ? 'bg-white text-foreground' : 'bg-foreground text-white'"
+          >
+            {{ badgeFor(item) }}
+          </span>
+        </span>
         <span
           class="transition-[transform,opacity,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
         >

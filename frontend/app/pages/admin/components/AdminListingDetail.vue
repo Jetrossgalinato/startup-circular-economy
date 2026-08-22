@@ -92,6 +92,19 @@ onMounted(async () => {
       </p>
     </div>
 
+    <div v-if="listing.status === 'claimed'" class="rounded-2xl border border-neutral-200 p-4">
+      <p class="text-sm font-semibold">Collector claim</p>
+      <p class="mt-1 text-sm text-foreground">
+        {{ listing.fulfillment_method === 'delivery' ? 'Delivery' : 'Pickup at cross-dock' }}
+      </p>
+      <p
+        v-if="listing.fulfillment_method === 'delivery' && listing.delivery_address"
+        class="mt-1 whitespace-pre-wrap text-sm text-muted-foreground"
+      >
+        {{ listing.delivery_address }}
+      </p>
+    </div>
+
     <Button
       v-if="listing.status === 'pickup_scheduled'"
       as-child

@@ -49,6 +49,7 @@ function normalizeCatalogRow(row: Record<string, unknown>): Listing {
     claimed_at: (row.claimed_at as string | null) ?? null,
     fulfillment_method: (row.fulfillment_method as FulfillmentMethod | null) ?? null,
     delivery_address: (row.delivery_address as string | null) ?? null,
+    claimed_seen_at: (row.claimed_seen_at as string | null) ?? null,
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
     listing_photos: (row.listing_photos as ListingPhoto[]) ?? [],
