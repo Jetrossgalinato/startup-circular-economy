@@ -10,6 +10,7 @@ definePageMeta({
 const { fetchMyListings, peekListings } = useListings()
 const listings = ref<Listing[]>(peekListings() ?? [])
 const loading = ref(listings.value.length === 0 && peekListings() === null)
+const { listingsTick } = useRealtimeTicks()
 
 async function loadListings(force = false) {
   const hadCache = peekListings() !== null
@@ -33,6 +34,10 @@ function onCancelled(id: string) {
 }
 
 onMounted(() => loadListings())
+
+watch(listingsTick, () => {
+  void loadListings(true)
+})
 </script>
 
 <template>

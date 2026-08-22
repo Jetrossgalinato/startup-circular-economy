@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HazardTier } from '@/types/listings'
+import loadingClip from '~/assets/videos/loading.mp4'
 
 const props = defineProps<{
   tier: HazardTier
@@ -25,12 +26,70 @@ const tierCopy: Record<HazardTier, { title: string; body: string; tone: string }
   },
   4: {
     title: 'Tier 4 — Intake refused',
-    body: 'We cannot safely pick this up. Contact DENR-EMB or the nearest accredited TSD facility for disposal guidance.',
+    body: 'We cannot safely pick this up. Call DENR-EMB Caraga (Butuan) or the DENR citizen hotline for TSD disposal guidance.',
     tone: 'bg-red-100 text-red-950',
   },
 }
 
 const copy = computed(() => tierCopy[props.tier])
+
+const progress = ref(8)
+const showResult = ref(!props.loading)
+let rampTimer: ReturnType<typeof setInterval> | null = null
+let completeTimer: ReturnType<typeof setTimeout> | null = null
+
+function stopRamp() {
+  if (rampTimer) {
+    clearInterval(rampTimer)
+    rampTimer = null
+  }
+}
+
+function startRamp() {
+  stopRamp()
+  progress.value = 8
+  showResult.value = false
+  rampTimer = setInterval(() => {
+    if (progress.value >= 90) {
+      return
+    }
+    progress.value = Math.min(90, progress.value + Math.max(5, (90 - progress.value) * 0.22))
+  }, 40)
+}
+
+watch(
+  () => props.loading,
+  (loading) => {
+    if (completeTimer) {
+      clearTimeout(completeTimer)
+      completeTimer = null
+    }
+
+    if (import.meta.server) {
+      showResult.value = !loading
+      return
+    }
+
+    if (loading) {
+      startRamp()
+      return
+    }
+
+    stopRamp()
+    progress.value = 100
+    completeTimer = setTimeout(() => {
+      showResult.value = true
+    }, 80)
+  },
+  { immediate: true },
+)
+
+onUnmounted(() => {
+  stopRamp()
+  if (completeTimer) {
+    clearTimeout(completeTimer)
+  }
+})
 </script>
 
 <template>
@@ -43,9 +102,32 @@ const copy = computed(() => tierCopy[props.tier])
       Our first job is safety — not guessing resale value.
     </p>
 
-    <div v-if="loading" class="mt-8 flex flex-col items-center gap-3 py-10">
-      <div class="size-10 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
-      <p class="text-sm text-muted-foreground">Running safety classification…</p>
+    <div v-if="!showResult" class="mt-8 py-6">
+      <video
+        :src="loadingClip"
+        class="mx-auto mb-4 h-28 w-auto object-contain sm:h-32"
+        autoplay
+        loop
+        muted
+        playsinline
+        aria-hidden="true"
+      />
+      <div
+        class="h-2 w-full overflow-hidden rounded-full bg-neutral-200"
+        role="progressbar"
+        :aria-valuenow="Math.round(progress)"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-label="Safety classification"
+      >
+        <div
+          class="h-full rounded-full bg-foreground transition-[width] duration-150 ease-out"
+          :style="{ width: `${progress}%` }"
+        />
+      </div>
+      <p class="mt-3 text-sm text-muted-foreground">
+        Running safety classification…
+      </p>
     </div>
 
     <div v-else class="mt-5 space-y-4">
@@ -70,6 +152,29 @@ const copy = computed(() => tierCopy[props.tier])
           {{ reason }}
         </li>
       </ul>
+
+      <div
+        v-if="tier === 4"
+        class="rounded-2xl border border-neutral-200 bg-white p-4"
+      >
+        <p class="text-sm font-semibold">Call for disposal</p>
+        <p class="mt-1 text-xs text-muted-foreground">
+          EMB Caraga — Butuan City (pilot)
+        </p>
+        <a
+          href="tel:+63853413826"
+          class="mt-2 block text-lg font-bold tracking-tight text-foreground underline underline-offset-2"
+        >
+          (085) 341-3826
+        </a>
+        <p class="mt-3 text-xs text-muted-foreground">DENR citizen hotline</p>
+        <a
+          href="tel:8888"
+          class="mt-0.5 block text-lg font-bold tracking-tight text-foreground underline underline-offset-2"
+        >
+          8888
+        </a>
+      </div>
     </div>
   </div>
 </template>

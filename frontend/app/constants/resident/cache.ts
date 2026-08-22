@@ -2,6 +2,7 @@ export const RESIDENT_CACHE_KEYS = {
   rateCard: 'resident-rate-card',
   listings: 'resident-listings',
   listing: (id: string) => `resident-listing:${id}`,
+  listingPrefix: 'resident-listing:',
   store: 'resident-cache-store',
   pending: 'resident-cache-pending',
 } as const
