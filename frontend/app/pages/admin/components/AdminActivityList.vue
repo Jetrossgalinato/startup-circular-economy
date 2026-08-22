@@ -21,9 +21,9 @@ defineProps<{
       v-else-if="listings.length === 0"
       class="rounded-2xl border border-dashed border-neutral-300 px-4 py-10 text-center"
     >
-      <p class="font-medium">No listings yet</p>
+      <p class="font-medium">No matching listings</p>
       <p class="mt-1 text-sm text-muted-foreground">
-        Resident sell requests will show up here.
+        Try another status, category, or resident name.
       </p>
     </div>
 
