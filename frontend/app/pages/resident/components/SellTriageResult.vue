@@ -26,7 +26,7 @@ const tierCopy: Record<HazardTier, { title: string; body: string; tone: string }
   },
   4: {
     title: 'Tier 4 — Intake refused',
-    body: 'We cannot safely pick this up. Contact DENR-EMB or the nearest accredited TSD facility for disposal guidance.',
+    body: 'We cannot safely pick this up. Call DENR-EMB Caraga (Butuan) or the DENR citizen hotline for TSD disposal guidance.',
     tone: 'bg-red-100 text-red-950',
   },
 }
@@ -152,6 +152,29 @@ onUnmounted(() => {
           {{ reason }}
         </li>
       </ul>
+
+      <div
+        v-if="tier === 4"
+        class="rounded-2xl border border-neutral-200 bg-white p-4"
+      >
+        <p class="text-sm font-semibold">Call for disposal</p>
+        <p class="mt-1 text-xs text-muted-foreground">
+          EMB Caraga — Butuan City (pilot)
+        </p>
+        <a
+          href="tel:+63853413826"
+          class="mt-2 block text-lg font-bold tracking-tight text-foreground underline underline-offset-2"
+        >
+          (085) 341-3826
+        </a>
+        <p class="mt-3 text-xs text-muted-foreground">DENR citizen hotline</p>
+        <a
+          href="tel:8888"
+          class="mt-0.5 block text-lg font-bold tracking-tight text-foreground underline underline-offset-2"
+        >
+          8888
+        </a>
+      </div>
     </div>
   </div>
 </template>
