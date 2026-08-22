@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HazardTier } from '@/types/listings'
+import loadingClip from '~/assets/videos/loading.mp4'
 
 const props = defineProps<{
   tier: HazardTier
@@ -102,6 +103,15 @@ onUnmounted(() => {
     </p>
 
     <div v-if="!showResult" class="mt-8 py-6">
+      <video
+        :src="loadingClip"
+        class="mx-auto mb-4 h-28 w-auto object-contain sm:h-32"
+        autoplay
+        loop
+        muted
+        playsinline
+        aria-hidden="true"
+      />
       <div
         class="h-2 w-full overflow-hidden rounded-full bg-neutral-200"
         role="progressbar"
