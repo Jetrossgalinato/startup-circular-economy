@@ -42,7 +42,7 @@ defineProps<{
           {{ activeCount }}
         </p>
         <p class="mt-0.5 text-sm text-foreground/70">
-          Listings in progress
+          Open listings (pickup or claimed)
         </p>
       </div>
       <div class="rounded-[1.5rem] bg-[#ead9c4] p-4">
