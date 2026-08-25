@@ -109,6 +109,13 @@ When a collector claims stock:
 
 - Edit published **₱/kg** per category. Changes apply to new quotes.
 
+### Chat
+
+- Header chat icon (left of **ADMIN**), with an unread badge for collector threads
+- Shared inbox: every admin sees the same collector conversations
+- Open a thread to reply. Collectors always see the other party as **Admin**
+- Text only. A thread appears after a collector sends the first message
+
 ### Profile
 
 - Contact details and log out
@@ -144,6 +151,12 @@ Status:
 - Rejected claims leave Orders and return to Browse
 - If you are in the app: toast on confirm or decline
 
+### Chat
+
+- Header chat icon (left of **COLLECTOR**), with an unread badge
+- Opens a single thread with **Admin** (all staff share that inbox)
+- Ask about a claim, pickup, or delivery. Text only; no photos
+
 ### Profile
 
 - Phone and address **required for delivery**
@@ -178,6 +191,7 @@ Resident → E-WISE (admin/cross-dock) → Collector
 
 - Residents never deal with collectors.
 - Collectors never go to the resident.
+- Collectors and admins can message each other in-app (header chat icon). Residents have no chat.
 - Pickup for collectors is the **Butuan cross-dock**, or **delivery to the collector**.
 
 ---
@@ -186,5 +200,5 @@ Resident → E-WISE (admin/cross-dock) → Collector
 
 - **Photos:** at least one; camera or gallery; allow camera on PC.
 - **Filters:** Activity chips only show statuses/categories you already have.
-- **Realtime:** new claims, intake, and order updates appear without refresh if you are logged in.
+- **Realtime:** new claims, intake, chat, and order updates appear without refresh if you are logged in.
 - **Device mode in Chrome/Firefox** still uses the **PC webcam**, not a phone camera.

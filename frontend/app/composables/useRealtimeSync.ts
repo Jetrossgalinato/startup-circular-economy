@@ -3,16 +3,20 @@ import { toast } from 'vue-sonner'
 import { RESIDENT_CACHE_KEYS } from '@/constants/resident/cache'
 import { ADMIN_CACHE_KEYS } from '@/constants/admin/cache'
 import { COLLECTOR_CACHE_KEYS } from '@/constants/collector/cache'
+import { CHAT_CACHE_KEYS } from '@/constants/chat'
 import { collectorClaimMessage } from '@/utils/listings/claims'
 import type { Listing } from '@/types/listings'
+import type { ChatConversation } from '@/types/chat'
 
 const LISTINGS_TICK_KEY = 'realtime-listings-tick'
 const RATE_CARD_TICK_KEY = 'realtime-rate-card-tick'
+const CHAT_TICK_KEY = 'realtime-chat-tick'
 
 export function useRealtimeTicks() {
   const listingsTick = useState(LISTINGS_TICK_KEY, () => 0)
   const rateCardTick = useState(RATE_CARD_TICK_KEY, () => 0)
-  return { listingsTick, rateCardTick }
+  const chatTick = useState(CHAT_TICK_KEY, () => 0)
+  return { listingsTick, rateCardTick, chatTick }
 }
 
 /**
@@ -23,7 +27,8 @@ export function useRealtimeSync() {
   const supabase = useSupabase()
   const { session, profile, user } = useAuth()
   const cache = useResidentCache()
-  const { listingsTick, rateCardTick } = useRealtimeTicks()
+  const route = useRoute()
+  const { listingsTick, rateCardTick, chatTick } = useRealtimeTicks()
 
   let channel: RealtimeChannel | null = null
 
@@ -102,6 +107,53 @@ export function useRealtimeSync() {
     rateCardTick.value += 1
   }
 
+  function bumpChat() {
+    cache.invalidate(CHAT_CACHE_KEYS.inbox)
+    cache.invalidate(CHAT_CACHE_KEYS.unread)
+    cache.invalidate(CHAT_CACHE_KEYS.ownConversation)
+    cache.invalidate(CHAT_CACHE_KEYS.threadPrefix)
+    chatTick.value += 1
+  }
+
+  function isViewingThread(conversationId: string) {
+    const path = route.path.replace(/\/$/, '')
+    if (profile.value?.role === 'collector') {
+      return path === '/collector/messages' || path.startsWith('/collector/messages/')
+    }
+    return path === `/admin/messages/${conversationId}`
+  }
+
+  function onMessageInsert(payload: RealtimePostgresChangesPayload<Record<string, unknown>>) {
+    bumpChat()
+
+    const row = payload.new as {
+      sender_id?: string
+      conversation_id?: string
+      collector_id?: string
+    } | undefined
+
+    if (!row?.sender_id || !row.conversation_id) {
+      return
+    }
+    if (row.sender_id === user.value?.id) {
+      return
+    }
+    if (isViewingThread(row.conversation_id)) {
+      return
+    }
+
+    if (profile.value?.role === 'collector') {
+      toast.success('New message from Admin')
+      return
+    }
+
+    if (profile.value?.role === 'admin' && row.sender_id === row.collector_id) {
+      const inbox = cache.getCached<ChatConversation[]>(CHAT_CACHE_KEYS.inbox)?.data
+      const name = inbox?.find((item) => item.id === row.conversation_id)?.collector?.full_name
+      toast.success(`New message from ${name || 'a collector'}`)
+    }
+  }
+
   function stop() {
     if (channel) {
       void supabase.removeChannel(channel)
@@ -128,6 +180,20 @@ export function useRealtimeSync() {
         { event: '*', schema: 'public', table: 'rate_card_categories' },
         () => {
           bumpRateCard()
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        (payload) => {
+          onMessageInsert(payload)
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'conversations' },
+        () => {
+          bumpChat()
         },
       )
       .subscribe()

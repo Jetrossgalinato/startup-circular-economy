@@ -1,0 +1,109 @@
+<script setup lang="ts">
+import type { ChatConversation, ChatMessage } from '@/types/chat'
+import { toast } from 'vue-sonner'
+
+definePageMeta({
+  layout: 'inside',
+  middleware: ['authenticated', 'role'],
+  role: 'admin',
+})
+
+const route = useRoute()
+const conversationId = computed(() => String(route.params.id))
+const { user } = useAuth()
+const {
+  fetchConversation,
+  fetchThread,
+  peekThread,
+  peekInbox,
+  sendMessage,
+  markRead,
+} = useChat()
+const { chatTick } = useRealtimeTicks()
+
+const conversation = ref<ChatConversation | null>(
+  peekInbox()?.find((item) => item.id === conversationId.value) ?? null,
+)
+const messages = ref<ChatMessage[]>(peekThread(conversationId.value) ?? [])
+const loading = ref(messages.value.length === 0)
+const sending = ref(false)
+
+async function load(showError = true, force = false) {
+  try {
+    const nextConversation = await fetchConversation(conversationId.value)
+    if (!nextConversation) {
+      if (showError) {
+        toast.error('Conversation not found')
+        await navigateTo('/admin/messages')
+      }
+      return
+    }
+    conversation.value = nextConversation
+    messages.value = await fetchThread(nextConversation.id, { force })
+    await markRead(nextConversation.id)
+  } catch (error) {
+    if (showError) {
+      toast.error('Could not load messages', {
+        description: error instanceof Error ? error.message : 'Try again later.',
+      })
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  void load()
+})
+
+watch(chatTick, () => {
+  void load(false, true)
+})
+
+watch(conversationId, () => {
+  loading.value = true
+  void load()
+})
+
+async function onSend(body: string) {
+  sending.value = true
+  try {
+    await sendMessage(body, conversationId.value)
+    await load(false, true)
+  } catch (error) {
+    toast.error('Could not send message', {
+      description: error instanceof Error ? error.message : 'Try again later.',
+    })
+  } finally {
+    sending.value = false
+  }
+}
+</script>
+
+<template>
+  <div>
+    <NuxtLink
+      to="/admin/messages"
+      class="text-sm text-muted-foreground underline underline-offset-2"
+    >
+      ← All messages
+    </NuxtLink>
+    <h1 class="mt-3 text-3xl font-bold tracking-tight">
+      {{ conversation?.collector?.full_name || 'Collector' }}
+    </h1>
+    <p class="mt-1.5 mb-4 text-sm text-muted-foreground">
+      Shared admin inbox
+    </p>
+    <ChatThread
+      :messages="messages"
+      :current-user-id="user?.id ?? ''"
+      viewer-role="admin"
+      :collector-name="conversation?.collector?.full_name || ''"
+      :loading="loading"
+      :sending="sending"
+      empty-title="No messages yet"
+      empty-description="Reply when this collector writes in."
+      @send="onSend"
+    />
+  </div>
+</template>
