@@ -3,6 +3,14 @@ import { Send } from '@lucide/vue'
 import type { ChatMessage } from '@/types/chat'
 import { MAX_CHAT_BODY_LENGTH } from '@/constants/chat'
 import { formatChatTime } from '@/utils/chat'
+import {
+  Message,
+  MessageAvatar,
+  MessageContent,
+  MessageFooter,
+  MessageGroup,
+  MessageHeader,
+} from '@/components/ui/message'
 
 const props = withDefaults(defineProps<{
   messages: ChatMessage[]
@@ -32,9 +40,36 @@ const canSend = computed(() => {
   return trimmed.length > 0 && trimmed.length <= MAX_CHAT_BODY_LENGTH && !props.sending
 })
 
+type MessageCluster = {
+  id: string
+  senderId: string
+  own: boolean
+  items: ChatMessage[]
+}
+
+const clusters = computed((): MessageCluster[] => {
+  const next: MessageCluster[] = []
+  for (const message of props.messages) {
+    const own = message.sender_id === props.currentUserId
+    const last = next[next.length - 1]
+    if (last && last.senderId === message.sender_id) {
+      last.items.push(message)
+    }
+    else {
+      next.push({
+        id: message.id,
+        senderId: message.sender_id,
+        own,
+        items: [message],
+      })
+    }
+  }
+  return next
+})
+
 function labelFor(message: ChatMessage) {
   if (message.sender_id === props.currentUserId) {
-    return null
+    return 'You'
   }
   if (props.viewerRole === 'collector') {
     return 'Admin'
@@ -45,8 +80,18 @@ function labelFor(message: ChatMessage) {
   return message.sender?.full_name || 'Admin'
 }
 
-function isOwn(message: ChatMessage) {
-  return message.sender_id === props.currentUserId
+function initialsFor(message: ChatMessage) {
+  const name = labelFor(message)
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  const first = parts[0]
+  if (!first) {
+    return '?'
+  }
+  const last = parts[parts.length - 1] ?? first
+  const letters = parts.length === 1
+    ? first.slice(0, 2)
+    : `${first.charAt(0)}${last.charAt(0)}`
+  return letters.toUpperCase()
 }
 
 async function scrollToBottom() {
@@ -86,7 +131,7 @@ function onKeydown(event: KeyboardEvent) {
   <div class="flex min-h-0 flex-1 flex-col">
     <div
       ref="listRef"
-      class="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1"
+      class="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1"
     >
       <p
         v-if="loading && messages.length === 0"
@@ -105,35 +150,46 @@ function onKeydown(event: KeyboardEvent) {
           {{ emptyDescription }}
         </p>
       </div>
-      <div
-        v-for="message in messages"
-        :key="message.id"
-        class="flex"
-        :class="isOwn(message) ? 'justify-end' : 'justify-start'"
+      <MessageGroup
+        v-for="cluster in clusters"
+        :key="cluster.id"
       >
-        <div
-          class="max-w-[85%] rounded-2xl px-3.5 py-2"
-          :class="isOwn(message)
-            ? 'bg-foreground text-white'
-            : 'border border-neutral-200 bg-neutral-50 text-foreground'"
+        <Message
+          v-for="(message, index) in cluster.items"
+          :key="message.id"
+          :align="cluster.own ? 'end' : 'start'"
         >
-          <p
-            v-if="labelFor(message)"
-            class="text-[10px] font-semibold tracking-wide uppercase opacity-70"
+          <MessageAvatar
+            v-if="index === cluster.items.length - 1"
+            class="size-8 text-[10px] font-semibold tracking-wide text-muted-foreground"
           >
-            {{ labelFor(message) }}
-          </p>
-          <p class="whitespace-pre-wrap text-sm leading-5">
-            {{ message.body }}
-          </p>
-          <p
-            class="mt-1 text-[10px]"
-            :class="isOwn(message) ? 'text-white/70' : 'text-muted-foreground'"
-          >
-            {{ formatChatTime(message.created_at) }}
-          </p>
-        </div>
-      </div>
+            {{ initialsFor(message) }}
+          </MessageAvatar>
+          <MessageAvatar
+            v-else
+            class="size-8 bg-transparent"
+          />
+          <MessageContent class="w-auto max-w-[85%]">
+            <MessageHeader
+              v-if="index === 0"
+              :class="cluster.own ? 'justify-end' : ''"
+            >
+              {{ labelFor(message) }}
+            </MessageHeader>
+            <div
+              class="rounded-2xl px-3.5 py-2 text-sm leading-5 whitespace-pre-wrap"
+              :class="cluster.own
+                ? 'bg-foreground text-white'
+                : 'border border-neutral-200 bg-muted text-foreground'"
+            >
+              {{ message.body }}
+            </div>
+            <MessageFooter>
+              {{ formatChatTime(message.created_at) }}
+            </MessageFooter>
+          </MessageContent>
+        </Message>
+      </MessageGroup>
       <div ref="bottomRef" />
     </div>
 
