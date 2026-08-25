@@ -1,5 +1,6 @@
 <script setup lang="ts">
 useRealtimeSync()
+useAppPresenceSync()
 </script>
 
 <template>
