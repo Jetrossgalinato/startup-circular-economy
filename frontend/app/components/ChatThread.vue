@@ -138,7 +138,7 @@ function onKeydown(event: KeyboardEvent) {
     </div>
 
     <form
-      class="mt-3 flex shrink-0 items-end gap-2 border-t border-neutral-200 bg-white pt-3"
+      class="mt-3 flex shrink-0 items-end gap-2 border-t border-neutral-200 bg-white pt-3 pb-4 pl-2"
       @submit.prevent="submit"
     >
       <textarea
