@@ -48,3 +48,22 @@ export function formatUnreadBadge(count: number): string | null {
   }
   return count > 9 ? '9+' : String(count)
 }
+
+export type OwnMessageStatus = 'Sent' | 'Delivered' | 'Seen'
+
+export function ownMessageStatus(input: {
+  createdAt: string | null | undefined
+  otherLastReadAt: string | null | undefined
+  chatmateOnline: boolean
+}): OwnMessageStatus {
+  if (!input.createdAt) {
+    return 'Sent'
+  }
+  if (input.otherLastReadAt && input.otherLastReadAt >= input.createdAt) {
+    return 'Seen'
+  }
+  if (input.chatmateOnline) {
+    return 'Delivered'
+  }
+  return 'Sent'
+}

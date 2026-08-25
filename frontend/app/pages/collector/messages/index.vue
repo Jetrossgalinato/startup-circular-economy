@@ -27,6 +27,7 @@ const loading = ref(!conversation.value || peekThread(conversation.value.id) ===
 const sending = ref(false)
 const conversationId = computed(() => conversation.value?.id ?? null)
 const { typingLines, notifyTyping, stopTyping } = useChatTyping(conversationId)
+const { isAdminOnline } = useAppPresence()
 
 async function load(force = false) {
   try {
@@ -88,6 +89,8 @@ async function onSend(body: string) {
       :loading="loading"
       :sending="sending"
       :typing-lines="typingLines"
+      :other-last-read-at="conversation?.admin_last_read_at"
+      :chatmate-online="isAdminOnline"
       empty-title="No messages yet"
       empty-description="Message the cross-dock about a claim, pickup, or delivery."
       @send="onSend"

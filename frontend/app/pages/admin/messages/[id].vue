@@ -21,6 +21,8 @@ const {
 } = useChat()
 const { chatTick } = useRealtimeTicks()
 const { typingLines, notifyTyping, stopTyping } = useChatTyping(conversationId)
+const { isUserOnline } = useAppPresence()
+const chatmateOnline = computed(() => isUserOnline(conversation.value?.collector_id))
 
 const conversation = ref<ChatConversation | null>(
   peekInbox()?.find((item) => item.id === conversationId.value) ?? null,
@@ -106,6 +108,8 @@ async function onSend(body: string) {
       :loading="loading"
       :sending="sending"
       :typing-lines="typingLines"
+      :other-last-read-at="conversation?.collector_last_read_at"
+      :chatmate-online="chatmateOnline"
       empty-title="No messages yet"
       empty-description="Reply when this collector writes in."
       @send="onSend"

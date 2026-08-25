@@ -2,7 +2,7 @@
 import { Send } from '@lucide/vue'
 import type { ChatMessage } from '@/types/chat'
 import { MAX_CHAT_BODY_LENGTH } from '@/constants/chat'
-import { formatChatTime } from '@/utils/chat'
+import { formatChatTime, ownMessageStatus } from '@/utils/chat'
 import {
   Avatar,
   AvatarFallback,
@@ -28,6 +28,8 @@ const props = withDefaults(defineProps<{
   loading?: boolean
   sending?: boolean
   typingLines?: string[]
+  otherLastReadAt?: string | null
+  chatmateOnline?: boolean
   emptyTitle: string
   emptyDescription: string
 }>(), {
@@ -35,6 +37,8 @@ const props = withDefaults(defineProps<{
   loading: false,
   sending: false,
   typingLines: () => [],
+  otherLastReadAt: null,
+  chatmateOnline: false,
 })
 
 const emit = defineEmits<{
@@ -116,6 +120,28 @@ function lastItem(cluster: MessageCluster) {
 function initialsForCluster(cluster: MessageCluster) {
   const message = firstItem(cluster)
   return message ? initialsFor(message) : '?'
+}
+
+const lastOwnClusterId = computed(() => {
+  for (let index = clusters.value.length - 1; index >= 0; index -= 1) {
+    const cluster = clusters.value[index]
+    if (cluster?.own) {
+      return cluster.id
+    }
+  }
+  return null
+})
+
+function footerStatus(cluster: MessageCluster) {
+  if (!cluster.own || cluster.id !== lastOwnClusterId.value) {
+    return null
+  }
+  const message = lastItem(cluster)
+  return ownMessageStatus({
+    createdAt: message?.created_at,
+    otherLastReadAt: props.otherLastReadAt,
+    chatmateOnline: props.chatmateOnline,
+  })
 }
 
 async function scrollToBottom() {
@@ -212,8 +238,14 @@ function onKeydown(event: KeyboardEvent) {
               {{ lastItem(cluster)?.body }}
             </BubbleContent>
           </Bubble>
-          <MessageFooter>
-            {{ formatChatTime(lastItem(cluster)?.created_at) }}
+          <MessageFooter
+            :class="cluster.own && cluster.id === lastOwnClusterId ? 'gap-1 text-neutral-500' : ''"
+          >
+            <span>{{ formatChatTime(lastItem(cluster)?.created_at) }}</span>
+            <template v-if="footerStatus(cluster)">
+              <span aria-hidden="true">·</span>
+              <span>{{ footerStatus(cluster) }}</span>
+            </template>
           </MessageFooter>
         </MessageContent>
       </Message>
