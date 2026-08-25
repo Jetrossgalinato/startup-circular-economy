@@ -10,7 +10,10 @@ defineProps<{
 
 <template>
   <div class="space-y-3">
-    <div v-if="loading" class="text-sm text-muted-foreground">
+    <div
+      v-if="loading && conversations.length === 0"
+      class="text-sm text-muted-foreground"
+    >
       Loading messages…
     </div>
     <div

@@ -393,6 +393,18 @@ export function useChat() {
   }
 
   async function markRead(conversationId: string): Promise<void> {
+    const existing = peekInbox()?.find((item) => item.id === conversationId)
+      ?? peekOwnConversation()
+      ?? null
+    if (existing) {
+      const readAt = profile.value?.role === 'admin'
+        ? existing.admin_last_read_at
+        : existing.collector_last_read_at
+      if (!existing.last_message_at || (readAt && readAt >= existing.last_message_at)) {
+        return
+      }
+    }
+
     const { data, error } = await supabase.rpc('mark_chat_read', {
       p_conversation_id: conversationId,
     })

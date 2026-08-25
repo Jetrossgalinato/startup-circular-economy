@@ -14,14 +14,14 @@ const conversations = ref<ChatConversation[]>(peekInbox() ?? [])
 const loading = ref(peekInbox() === null)
 
 async function load(force = false) {
-  const hadCache = peekInbox() !== null
-  if (!hadCache) {
+  const hasRows = conversations.value.length > 0
+  if (!hasRows) {
     loading.value = true
   }
   try {
     conversations.value = await fetchInbox({ force })
   } catch {
-    if (!hadCache) {
+    if (!hasRows) {
       conversations.value = []
     }
   } finally {

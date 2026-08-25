@@ -107,12 +107,20 @@ export function useRealtimeSync() {
     rateCardTick.value += 1
   }
 
+  let chatBumpTimer: ReturnType<typeof setTimeout> | null = null
+
   function bumpChat() {
     cache.invalidate(CHAT_CACHE_KEYS.inbox)
     cache.invalidate(CHAT_CACHE_KEYS.unread)
     cache.invalidate(CHAT_CACHE_KEYS.ownConversation)
     cache.invalidate(CHAT_CACHE_KEYS.threadPrefix)
-    chatTick.value += 1
+    if (chatBumpTimer) {
+      clearTimeout(chatBumpTimer)
+    }
+    chatBumpTimer = setTimeout(() => {
+      chatTick.value += 1
+      chatBumpTimer = null
+    }, 80)
   }
 
   function isViewingThread(conversationId: string) {
@@ -155,6 +163,10 @@ export function useRealtimeSync() {
   }
 
   function stop() {
+    if (chatBumpTimer) {
+      clearTimeout(chatBumpTimer)
+      chatBumpTimer = null
+    }
     if (channel) {
       void supabase.removeChannel(channel)
       channel = null
