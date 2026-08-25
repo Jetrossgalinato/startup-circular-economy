@@ -4,12 +4,20 @@ import type { ChatMessage } from '@/types/chat'
 import { MAX_CHAT_BODY_LENGTH } from '@/constants/chat'
 import { formatChatTime } from '@/utils/chat'
 import {
+  Avatar,
+  AvatarFallback,
+} from '@/components/ui/avatar'
+import {
+  Bubble,
+  BubbleContent,
+  BubbleGroup,
+} from '@/components/ui/bubble'
+import { Marker, MarkerContent } from '@/components/ui/marker'
+import {
   Message,
   MessageAvatar,
   MessageContent,
   MessageFooter,
-  MessageGroup,
-  MessageHeader,
 } from '@/components/ui/message'
 
 const props = withDefaults(defineProps<{
@@ -94,6 +102,19 @@ function initialsFor(message: ChatMessage) {
   return letters.toUpperCase()
 }
 
+function firstItem(cluster: MessageCluster) {
+  return cluster.items[0]
+}
+
+function lastItem(cluster: MessageCluster) {
+  return cluster.items[cluster.items.length - 1] ?? cluster.items[0]
+}
+
+function initialsForCluster(cluster: MessageCluster) {
+  const message = firstItem(cluster)
+  return message ? initialsFor(message) : '?'
+}
+
 async function scrollToBottom() {
   await nextTick()
   bottomRef.value?.scrollIntoView({ block: 'end' })
@@ -131,14 +152,17 @@ function onKeydown(event: KeyboardEvent) {
   <div class="flex min-h-0 flex-1 flex-col">
     <div
       ref="listRef"
-      class="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1"
+      class="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-1"
     >
-      <p
+      <Marker
         v-if="loading && messages.length === 0"
-        class="py-8 text-center text-sm text-muted-foreground"
+        role="status"
       >
-        Loading messages…
-      </p>
+        <MarkerContent>
+          Loading messages…
+        </MarkerContent>
+      </Marker>
+
       <div
         v-else-if="messages.length === 0"
         class="rounded-2xl border border-dashed border-neutral-300 px-4 py-10 text-center"
@@ -150,46 +174,52 @@ function onKeydown(event: KeyboardEvent) {
           {{ emptyDescription }}
         </p>
       </div>
-      <MessageGroup
+
+      <Message
         v-for="cluster in clusters"
         :key="cluster.id"
+        :align="cluster.own ? 'end' : 'start'"
       >
-        <Message
-          v-for="(message, index) in cluster.items"
-          :key="message.id"
-          :align="cluster.own ? 'end' : 'start'"
-        >
-          <MessageAvatar
-            v-if="index === cluster.items.length - 1"
-            class="size-8 text-[10px] font-semibold tracking-wide text-muted-foreground"
-          >
-            {{ initialsFor(message) }}
-          </MessageAvatar>
-          <MessageAvatar
+        <MessageAvatar>
+          <Avatar>
+            <AvatarFallback>{{ initialsForCluster(cluster) }}</AvatarFallback>
+          </Avatar>
+        </MessageAvatar>
+        <MessageContent>
+          <BubbleGroup v-if="cluster.items.length > 1">
+            <Bubble
+              v-for="message in cluster.items"
+              :key="message.id"
+              :variant="cluster.own ? 'default' : 'muted'"
+            >
+              <BubbleContent class="whitespace-pre-wrap">
+                {{ message.body }}
+              </BubbleContent>
+            </Bubble>
+          </BubbleGroup>
+          <Bubble
             v-else
-            class="size-8 bg-transparent"
-          />
-          <MessageContent class="w-auto max-w-[85%]">
-            <MessageHeader
-              v-if="index === 0"
-              :class="cluster.own ? 'justify-end' : ''"
-            >
-              {{ labelFor(message) }}
-            </MessageHeader>
-            <div
-              class="rounded-2xl px-3.5 py-2 text-sm leading-5 whitespace-pre-wrap"
-              :class="cluster.own
-                ? 'bg-foreground text-white'
-                : 'border border-neutral-200 bg-muted text-foreground'"
-            >
-              {{ message.body }}
-            </div>
-            <MessageFooter>
-              {{ formatChatTime(message.created_at) }}
-            </MessageFooter>
-          </MessageContent>
-        </Message>
-      </MessageGroup>
+            :variant="cluster.own ? 'default' : 'muted'"
+          >
+            <BubbleContent class="whitespace-pre-wrap">
+              {{ lastItem(cluster)?.body }}
+            </BubbleContent>
+          </Bubble>
+          <MessageFooter>
+            {{ formatChatTime(lastItem(cluster)?.created_at) }}
+          </MessageFooter>
+        </MessageContent>
+      </Message>
+
+      <Marker
+        v-if="sending"
+        role="status"
+      >
+        <MarkerContent>
+          Sending…
+        </MarkerContent>
+      </Marker>
+
       <div ref="bottomRef" />
     </div>
 
