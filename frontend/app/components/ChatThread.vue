@@ -83,7 +83,7 @@ function onKeydown(event: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="flex h-[calc(100dvh-12.5rem)] flex-col">
+  <div class="flex min-h-0 flex-1 flex-col">
     <div
       ref="listRef"
       class="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1"
@@ -138,7 +138,7 @@ function onKeydown(event: KeyboardEvent) {
     </div>
 
     <form
-      class="mt-3 flex items-end gap-2 border-t border-neutral-200 pt-3"
+      class="mt-3 flex shrink-0 items-end gap-2 border-t border-neutral-200 bg-white pt-3"
       @submit.prevent="submit"
     >
       <textarea

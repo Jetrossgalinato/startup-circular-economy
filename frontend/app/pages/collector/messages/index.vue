@@ -71,11 +71,11 @@ async function onSend(body: string) {
 </script>
 
 <template>
-  <div>
-    <h1 class="text-3xl font-bold tracking-tight">
+  <div class="flex h-[calc(100dvh-13rem)] flex-col overflow-hidden">
+    <h1 class="shrink-0 text-3xl font-bold tracking-tight">
       Admin
     </h1>
-    <p class="mt-1.5 mb-4 text-sm text-muted-foreground">
+    <p class="mt-1.5 mb-4 shrink-0 text-sm text-muted-foreground">
       Cross-dock. All staff share this inbox.
     </p>
     <ChatThread

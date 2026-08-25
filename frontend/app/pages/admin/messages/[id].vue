@@ -81,17 +81,17 @@ async function onSend(body: string) {
 </script>
 
 <template>
-  <div>
+  <div class="flex h-[calc(100dvh-13rem)] flex-col overflow-hidden">
     <NuxtLink
       to="/admin/messages"
-      class="text-sm text-muted-foreground underline underline-offset-2"
+      class="shrink-0 text-sm text-muted-foreground underline underline-offset-2"
     >
       ← All messages
     </NuxtLink>
-    <h1 class="mt-3 text-3xl font-bold tracking-tight">
+    <h1 class="mt-3 shrink-0 text-3xl font-bold tracking-tight">
       {{ conversation?.collector?.full_name || 'Collector' }}
     </h1>
-    <p class="mt-1.5 mb-4 text-sm text-muted-foreground">
+    <p class="mt-1.5 mb-4 shrink-0 text-sm text-muted-foreground">
       Shared admin inbox
     </p>
     <ChatThread
