@@ -33,7 +33,9 @@ async function load(showError = true, force = false) {
     const nextConversation = await fetchConversation(conversationId.value)
     if (!nextConversation) {
       if (showError) {
-        toast.error('Conversation not found')
+        toast.error('Conversation not found', {
+          description: 'It may have been removed.',
+        })
         await navigateTo('/admin/messages')
       }
       return

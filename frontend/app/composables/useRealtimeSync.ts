@@ -151,14 +151,18 @@ export function useRealtimeSync() {
     }
 
     if (profile.value?.role === 'collector') {
-      toast.success('New message from Admin')
+      toast.success('New message from Admin', {
+        description: 'Open chat to read it.',
+      })
       return
     }
 
     if (profile.value?.role === 'admin' && row.sender_id === row.collector_id) {
       const inbox = cache.getCached<ChatConversation[]>(CHAT_CACHE_KEYS.inbox)?.data
       const name = inbox?.find((item) => item.id === row.conversation_id)?.collector?.full_name
-      toast.success(`New message from ${name || 'a collector'}`)
+      toast.success(`New message from ${name || 'a collector'}`, {
+        description: 'Open Messages to reply.',
+      })
     }
   }
 
