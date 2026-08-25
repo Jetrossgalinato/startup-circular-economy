@@ -48,7 +48,7 @@ defineProps<{
           </span>
           <span
             v-if="isAdminThreadUnread(conversation)"
-            class="size-2 rounded-full bg-foreground"
+            class="size-2 rounded-full bg-[#e07070]"
             aria-label="Unread"
           />
         </div>

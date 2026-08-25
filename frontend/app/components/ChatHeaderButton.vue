@@ -74,7 +74,7 @@ watch(
     />
     <span
       v-if="badge"
-      class="absolute -top-0.5 -right-0.5 min-w-4 rounded-full bg-foreground px-1 text-center text-[9px] font-bold leading-4 text-white"
+      class="absolute -top-0.5 -right-0.5 min-w-4 rounded-full bg-[#e07070] px-1 text-center text-[9px] font-bold leading-4 text-white"
     >
       {{ badge }}
     </span>
