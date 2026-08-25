@@ -36,8 +36,11 @@ const homeTo = computed(() => {
       >
     </NuxtLink>
 
-    <p class="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase sm:text-sm sm:tracking-[0.18em]">
-      {{ roleLabel }}
-    </p>
+    <div class="flex items-center gap-2 sm:gap-3">
+      <ChatHeaderButton />
+      <p class="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase sm:text-sm sm:tracking-[0.18em]">
+        {{ roleLabel }}
+      </p>
+    </div>
   </header>
 </template>
