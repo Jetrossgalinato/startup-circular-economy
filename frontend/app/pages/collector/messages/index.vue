@@ -25,6 +25,8 @@ const messages = ref<ChatMessage[]>(
 )
 const loading = ref(!conversation.value || peekThread(conversation.value.id) === null)
 const sending = ref(false)
+const conversationId = computed(() => conversation.value?.id ?? null)
+const { typingLines, notifyTyping, stopTyping } = useChatTyping(conversationId)
 
 async function load(force = false) {
   try {
@@ -58,6 +60,7 @@ watch(chatTick, () => {
 async function onSend(body: string) {
   sending.value = true
   try {
+    await stopTyping()
     await sendMessage(body, conversation.value?.id)
     await load(true)
   } catch (error) {
@@ -84,9 +87,11 @@ async function onSend(body: string) {
       viewer-role="collector"
       :loading="loading"
       :sending="sending"
+      :typing-lines="typingLines"
       empty-title="No messages yet"
       empty-description="Message the cross-dock about a claim, pickup, or delivery."
       @send="onSend"
+      @typing="notifyTyping"
     />
   </div>
 </template>

@@ -27,16 +27,19 @@ const props = withDefaults(defineProps<{
   collectorName?: string
   loading?: boolean
   sending?: boolean
+  typingLines?: string[]
   emptyTitle: string
   emptyDescription: string
 }>(), {
   collectorName: '',
   loading: false,
   sending: false,
+  typingLines: () => [],
 })
 
 const emit = defineEmits<{
   send: [body: string]
+  typing: []
 }>()
 
 const draft = ref('')
@@ -121,7 +124,7 @@ async function scrollToBottom() {
 }
 
 watch(
-  () => props.messages.length,
+  () => [props.messages.length, props.typingLines.length] as const,
   () => {
     void scrollToBottom()
   },
@@ -138,6 +141,10 @@ function submit() {
   }
   emit('send', trimmed)
   draft.value = ''
+}
+
+function onInput() {
+  emit('typing')
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -212,6 +219,17 @@ function onKeydown(event: KeyboardEvent) {
       </Message>
 
       <Marker
+        v-for="label in typingLines"
+        :key="label"
+        role="status"
+        class="text-neutral-500"
+      >
+        <MarkerContent class="text-neutral-500">
+          <span class="font-medium">{{ label }}</span> is typing...
+        </MarkerContent>
+      </Marker>
+
+      <Marker
         v-if="sending"
         role="status"
       >
@@ -234,6 +252,7 @@ function onKeydown(event: KeyboardEvent) {
         :disabled="sending"
         class="max-h-28 min-h-10 flex-1 resize-none rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         placeholder="Type a message"
+        @input="onInput"
         @keydown="onKeydown"
       />
       <Button

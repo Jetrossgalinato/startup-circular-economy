@@ -20,6 +20,7 @@ const {
   markRead,
 } = useChat()
 const { chatTick } = useRealtimeTicks()
+const { typingLines, notifyTyping, stopTyping } = useChatTyping(conversationId)
 
 const conversation = ref<ChatConversation | null>(
   peekInbox()?.find((item) => item.id === conversationId.value) ?? null,
@@ -70,6 +71,7 @@ watch(conversationId, () => {
 async function onSend(body: string) {
   sending.value = true
   try {
+    await stopTyping()
     await sendMessage(body, conversationId.value)
     await load(false, true)
   } catch (error) {
@@ -103,9 +105,11 @@ async function onSend(body: string) {
       :collector-name="conversation?.collector?.full_name || ''"
       :loading="loading"
       :sending="sending"
+      :typing-lines="typingLines"
       empty-title="No messages yet"
       empty-description="Reply when this collector writes in."
       @send="onSend"
+      @typing="notifyTyping"
     />
   </div>
 </template>
