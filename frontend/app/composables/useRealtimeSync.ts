@@ -4,6 +4,7 @@ import { RESIDENT_CACHE_KEYS } from '@/constants/resident/cache'
 import { ADMIN_CACHE_KEYS } from '@/constants/admin/cache'
 import { COLLECTOR_CACHE_KEYS } from '@/constants/collector/cache'
 import { CHAT_CACHE_KEYS } from '@/constants/chat'
+import { DIY_CACHE_KEYS } from '@/constants/diy/cache'
 import { collectorClaimMessage } from '@/utils/listings/claims'
 import type { Listing } from '@/types/listings'
 import type { ChatConversation } from '@/types/chat'
@@ -11,12 +12,14 @@ import type { ChatConversation } from '@/types/chat'
 const LISTINGS_TICK_KEY = 'realtime-listings-tick'
 const RATE_CARD_TICK_KEY = 'realtime-rate-card-tick'
 const CHAT_TICK_KEY = 'realtime-chat-tick'
+const DIY_TICK_KEY = 'realtime-diy-tick'
 
 export function useRealtimeTicks() {
   const listingsTick = useState(LISTINGS_TICK_KEY, () => 0)
   const rateCardTick = useState(RATE_CARD_TICK_KEY, () => 0)
   const chatTick = useState(CHAT_TICK_KEY, () => 0)
-  return { listingsTick, rateCardTick, chatTick }
+  const diyTick = useState(DIY_TICK_KEY, () => 0)
+  return { listingsTick, rateCardTick, chatTick, diyTick }
 }
 
 /**
@@ -28,7 +31,7 @@ export function useRealtimeSync() {
   const { session, profile, user } = useAuth()
   const cache = useResidentCache()
   const route = useRoute()
-  const { listingsTick, rateCardTick, chatTick } = useRealtimeTicks()
+  const { listingsTick, rateCardTick, chatTick, diyTick } = useRealtimeTicks()
 
   let channel: RealtimeChannel | null = null
 
@@ -97,6 +100,69 @@ export function useRealtimeSync() {
         toast.error('Claim declined', {
           description: 'This lot is back on Browse.',
         })
+      }
+    }
+  }
+
+  function bumpDiy() {
+    cache.invalidate(DIY_CACHE_KEYS.catalog)
+    cache.invalidate(DIY_CACHE_KEYS.myListings)
+    cache.invalidate(DIY_CACHE_KEYS.reviewQueue)
+    cache.invalidate(DIY_CACHE_KEYS.productPrefix)
+    cache.invalidate(DIY_CACHE_KEYS.cart)
+    cache.invalidate(DIY_CACHE_KEYS.residentOrders)
+    cache.invalidate(DIY_CACHE_KEYS.collectorOrders)
+    cache.invalidate(DIY_CACHE_KEYS.adminOrders)
+    cache.invalidate(DIY_CACHE_KEYS.orderPrefix)
+    diyTick.value += 1
+  }
+
+  function onDiyProductChange(payload: RealtimePostgresChangesPayload<Record<string, unknown>>) {
+    bumpDiy()
+    const next = payload.new as { status?: string, collector_id?: string } | undefined
+    const prev = payload.old as { status?: string } | undefined
+    if (
+      profile.value?.role === 'admin'
+      && next?.status === 'pending_review'
+      && prev?.status !== 'pending_review'
+    ) {
+      toast.success('New DIY listing to review')
+    }
+    if (
+      profile.value?.role === 'collector'
+      && user.value
+      && next?.collector_id === user.value.id
+      && next?.status === 'active'
+      && prev?.status !== 'active'
+    ) {
+      toast.success('Your DIY listing is live')
+    }
+  }
+
+  function onDiyOrderChange(payload: RealtimePostgresChangesPayload<Record<string, unknown>>) {
+    bumpDiy()
+    const next = payload.new as {
+      collector_id?: string
+      resident_id?: string
+      status?: string
+    } | undefined
+    const prev = payload.old as { status?: string } | undefined
+    if (!next || !user.value) return
+
+    if (profile.value?.role === 'collector' && next.collector_id === user.value.id) {
+      if (payload.eventType === 'INSERT') {
+        toast.success('New DIY order')
+      }
+    }
+    if (profile.value?.role === 'resident' && next.resident_id === user.value.id) {
+      if (next.status === 'paid' && prev?.status !== 'paid') {
+        toast.success('Collector marked your DIY order paid')
+      }
+      if (next.status === 'ready' && prev?.status !== 'ready') {
+        toast.success('Your DIY order is ready for pickup')
+      }
+      if (next.status === 'out_for_delivery' && prev?.status !== 'out_for_delivery') {
+        toast.success('Your DIY order is out for delivery')
       }
     }
   }
@@ -210,6 +276,20 @@ export function useRealtimeSync() {
         { event: '*', schema: 'public', table: 'conversations' },
         () => {
           bumpChat()
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'diy_products' },
+        (payload) => {
+          onDiyProductChange(payload)
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'diy_orders' },
+        (payload) => {
+          onDiyOrderChange(payload)
         },
       )
       .subscribe()

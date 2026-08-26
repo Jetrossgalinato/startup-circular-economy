@@ -105,6 +105,13 @@ watch(rateCardTick, () => {
       <ChevronRight class="mt-0.5 size-5 shrink-0 text-foreground/40" />
     </NuxtLink>
     
+    <DiyTeaserCard
+      to="/admin/market"
+      kicker="DIY MARKET"
+      title="Review listings"
+      body="Approve collector upcycles and oversee resident orders."
+    />
+
     <div class="grid grid-cols-2 gap-3">
       <NuxtLink
         to="/admin/activity"

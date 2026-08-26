@@ -189,14 +189,41 @@ Status:
 Resident → E-WISE (admin/cross-dock) → Collector
 ```
 
-- Residents never deal with collectors.
-- Collectors never go to the resident.
+- For **e-waste sell / claims**, residents never deal with collectors. Collectors pick up at the **Butuan cross-dock** or receive **delivery**.
+- **DIY Market is the exception:** residents buy upcycled goods directly from collectors (GCash number or cash). No in-app chat; the order shows pickup/delivery details.
 - Collectors and admins can message each other in-app (header chat icon). Residents have no chat.
-- Pickup for collectors is the **Butuan cross-dock**, or **delivery to the collector**.
 
 ---
 
-## 8. Tips
+## 8. DIY Market (all roles)
+
+**Nav:** Market (fifth tab)
+
+Products must be **made from e-waste**. Admin approves listings before residents can buy. Checkout is **one product at a time**. Cart only saves items. There is no payment gateway — GCash numbers are shown in-app.
+
+### Resident
+
+- Browse live pieces, filter by category
+- **Add to cart** or **Buy now**
+- Checkout: quantity, GCash or cash, pickup or delivery
+- GCash shows the collector’s number (copy it and send the total)
+- **My orders:** cancel while waiting for payment; **Mark received** after pickup/delivery
+
+### Collector
+
+- Add GCash, phone, and address on **Profile**
+- **Sell** a piece (photos, details, e-waste source, price, stock) → waits for admin
+- Incoming DIY orders: **Mark paid**, then **Ready for pickup** or **Out for delivery**, or **Reject** while unpaid
+
+### Admin
+
+- **Review** queue: approve or reject (optional reason)
+- **Catalog:** hide a live listing
+- **Orders:** read-only oversight
+
+---
+
+## 9. Tips
 
 - **Photos:** at least one; camera or gallery; allow camera on PC.
 - **Filters:** Activity chips only show statuses/categories you already have.

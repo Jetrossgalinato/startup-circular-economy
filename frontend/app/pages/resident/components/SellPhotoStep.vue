@@ -2,10 +2,15 @@
 import { Camera, ImagePlus, Images, X } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   files: File[]
   previews: string[]
-}>()
+  heading?: string
+  hint?: string
+}>(), {
+  heading: 'Add clear photos',
+  hint: 'Include the whole device, any damage, and the battery compartment if visible.',
+})
 
 const emit = defineEmits<{
   add: [files: File[]]
@@ -145,11 +150,10 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
-      Add clear
-      <span class="font-serif font-medium italic">photos</span>
+      {{ props.heading }}
     </h2>
     <p class="mt-1.5 text-sm text-muted-foreground">
-      Include the whole device, any damage, and the battery compartment if visible.
+      {{ props.hint }}
     </p>
 
     <div class="mt-5 grid grid-cols-3 gap-2 sm:gap-3">

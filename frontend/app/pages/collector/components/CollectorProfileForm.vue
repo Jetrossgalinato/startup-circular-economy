@@ -7,6 +7,7 @@ const { profile, updateProfile, signOut } = useAuth()
 const fullName = ref(profile.value?.full_name ?? '')
 const phone = ref(profile.value?.phone ?? '')
 const address = ref(profile.value?.address ?? '')
+const gcashNumber = ref(profile.value?.default_gcash_number ?? '')
 const saving = ref(false)
 const loggingOut = ref(false)
 
@@ -15,6 +16,7 @@ watch(profile, (next) => {
   fullName.value = next.full_name
   phone.value = next.phone ?? ''
   address.value = next.address ?? ''
+  gcashNumber.value = next.default_gcash_number ?? ''
 })
 
 const isDirty = computed(() => {
@@ -26,6 +28,7 @@ const isDirty = computed(() => {
     fullName.value.trim() !== saved.full_name
     || (phone.value.trim() || null) !== (saved.phone || null)
     || (address.value.trim() || null) !== (saved.address || null)
+    || (gcashNumber.value.trim() || null) !== (saved.default_gcash_number || null)
   )
 })
 
@@ -46,6 +49,7 @@ async function save() {
       full_name: fullName.value.trim(),
       phone: phone.value.trim() || null,
       address: address.value.trim() || null,
+      default_gcash_number: gcashNumber.value.trim() || null,
     })
     toast.success('Profile updated', {
       description: 'Delivery claims will use this address.',
@@ -87,7 +91,7 @@ async function handleLogout() {
         <span class="font-serif font-medium italic">profile</span>
       </h1>
       <p class="mt-1.5 text-sm text-muted-foreground">
-        Phone and address are required if you want lots delivered.
+        Phone and address are required for stock delivery and DIY pickup. Add GCash so residents can pay you in the marketplace.
       </p>
     </div>
 
@@ -107,6 +111,11 @@ async function handleLogout() {
         rows="3"
         class="min-h-24 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm"
       />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <Label for="gcash">GCash number (DIY sales)</Label>
+      <Input id="gcash" v-model="gcashNumber" type="tel" :class="AUTH_INPUT_CLASS" placeholder="09XXXXXXXXX" />
     </div>
 
     <Button

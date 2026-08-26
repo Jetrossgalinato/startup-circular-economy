@@ -93,6 +93,13 @@ watch(listingsTick, () => {
       </NuxtLink>
     </Button>
 
+    <DiyTeaserCard
+      to="/collector/market"
+      kicker="DIY MARKET"
+      title="Sell upcycled pieces"
+      body="List products made from e-waste. Admin reviews before they go live."
+    />
+
     <div>
       <div class="mb-3 flex items-center justify-between">
         <h2 class="text-sm font-semibold">Available now</h2>

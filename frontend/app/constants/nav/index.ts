@@ -5,6 +5,7 @@ import {
   Package,
   PlusCircle,
   Scale,
+  Store,
   UserRound,
   Warehouse,
 } from '@lucide/vue'
@@ -39,6 +40,12 @@ export const ROLE_NAV_ITEMS: Record<UserRole, InsideNavItem[]> = {
       match: (path) => path.startsWith('/resident/activity'),
     },
     {
+      label: 'Market',
+      to: '/resident/market',
+      icon: Store,
+      match: (path) => path.startsWith('/resident/market'),
+    },
+    {
       label: 'Profile',
       to: '/resident/profile',
       icon: UserRound,
@@ -65,6 +72,12 @@ export const ROLE_NAV_ITEMS: Record<UserRole, InsideNavItem[]> = {
       match: (path) => path.startsWith('/admin/activity'),
     },
     {
+      label: 'Market',
+      to: '/admin/market',
+      icon: Store,
+      match: (path) => path.startsWith('/admin/market'),
+    },
+    {
       label: 'Profile',
       to: '/admin/profile',
       icon: UserRound,
@@ -88,7 +101,13 @@ export const ROLE_NAV_ITEMS: Record<UserRole, InsideNavItem[]> = {
       label: 'Orders',
       to: '/collector/orders',
       icon: Warehouse,
-      match: (path) => path.startsWith('/collector/orders'),
+      match: (path) => path.startsWith('/collector/orders') && !path.startsWith('/collector/market'),
+    },
+    {
+      label: 'Market',
+      to: '/collector/market',
+      icon: Store,
+      match: (path) => path.startsWith('/collector/market'),
     },
     {
       label: 'Profile',

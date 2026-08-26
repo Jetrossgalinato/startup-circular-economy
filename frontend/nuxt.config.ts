@@ -59,6 +59,11 @@ export default defineNuxtConfig({
       extensions: ['.vue'],
       pathPrefix: false,
     },
+    {
+      path: '~/pages/market/components',
+      extensions: ['.vue'],
+      pathPrefix: false,
+    },
   ],
   vite: {
     plugins: [
