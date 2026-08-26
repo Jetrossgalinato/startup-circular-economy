@@ -170,6 +170,9 @@ function submit() {
 }
 
 function onInput() {
+  if (!draft.value.trim() || props.sending) {
+    return
+  }
   emit('typing')
 }
 
