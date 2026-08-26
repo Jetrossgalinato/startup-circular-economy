@@ -44,6 +44,7 @@ function asProduct(row: Record<string, unknown>): DiyProduct {
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
     diy_product_photos: photos,
+    has_orders: false,
   }
 }
 
@@ -149,7 +150,24 @@ export function useDiyProducts() {
         }
 
         const products = await withPhotos((data ?? []).map((row) => asProduct(row as Record<string, unknown>)))
+        const ids = products.map((product) => product.id)
+        const orderedIds = new Set<string>()
+        if (ids.length > 0) {
+          const { data: orders, error: orderError } = await supabase
+            .from('diy_orders')
+            .select('product_id')
+            .in('product_id', ids)
+
+          if (orderError) {
+            throw new Error(orderError.message)
+          }
+          for (const order of orders ?? []) {
+            orderedIds.add(order.product_id as string)
+          }
+        }
+
         for (const product of products) {
+          product.has_orders = orderedIds.has(product.id)
           remember(product)
         }
         return products
@@ -290,7 +308,11 @@ export function useDiyProducts() {
       .eq('id', id)
 
     if (error) {
-      throw new Error(error.message)
+      const message = error.message
+      if (message.includes('diy_orders_product_id_fkey') || message.includes('foreign key')) {
+        throw new Error('This listing has orders and cannot be deleted.')
+      }
+      throw new Error(message)
     }
 
     invalidateProducts()
