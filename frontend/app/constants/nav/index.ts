@@ -2,7 +2,6 @@ import type { Component } from 'vue'
 import {
   ClipboardList,
   Home,
-  Inbox,
   Package,
   PlusCircle,
   Scale,
@@ -58,13 +57,6 @@ export const ROLE_NAV_ITEMS: Record<UserRole, InsideNavItem[]> = {
       to: '/admin/intake',
       icon: Scale,
       match: (path) => path.startsWith('/admin/intake'),
-    },
-    {
-      label: 'Claims',
-      to: '/admin/claims',
-      icon: Inbox,
-      badge: 'claims',
-      match: (path) => path.startsWith('/admin/claims'),
     },
     {
       label: 'Activity',
