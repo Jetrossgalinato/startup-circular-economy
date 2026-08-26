@@ -35,7 +35,17 @@ function listingTo(product: DiyProduct) {
 }
 
 function canDelete(product: DiyProduct) {
+  if (product.has_orders) {
+    return false
+  }
   return product.status === 'draft' || product.status === 'rejected' || product.status === 'hidden'
+}
+
+function showFooterAction(product: DiyProduct) {
+  if (product.status === 'hidden' && product.has_orders) {
+    return false
+  }
+  return true
 }
 
 function openRemove(product: DiyProduct) {
@@ -112,7 +122,7 @@ watch(diyTick, () => { void load(true) })
         :to="listingTo(product)"
         show-status
       >
-        <template #footer>
+        <template v-if="showFooterAction(product)" #footer>
           <Button
             type="button"
             variant="outline"
