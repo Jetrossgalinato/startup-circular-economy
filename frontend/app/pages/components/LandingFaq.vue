@@ -23,9 +23,9 @@ const items = [
       'Every unit is hazard-checked at intake. Damaged batteries and other high-risk items are diverted to a dedicated path with an accredited partner, not mixed into general resale.',
   },
   {
-    question: 'Can I get a device repaired instead?',
+    question: 'Can I buy something made from e-waste?',
     answer:
-      'Yes. Repair is a separate marketplace with verified technicians. You book a job on the platform, and ratings only count after a completed, booked repair.',
+      'Yes. The DIY Market sells upcycled products made from e-waste. Collectors list pieces, admin reviews them, and residents buy with GCash or cash. Pickup is at the collector, or the collector can deliver.',
   },
 ]
 

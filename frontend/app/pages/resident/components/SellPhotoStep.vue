@@ -2,15 +2,25 @@
 import { Camera, ImagePlus, Images, X } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   files: File[]
   previews: string[]
-}>()
+  heading?: string
+  hint?: string
+  savedPhotos?: { id: string, url: string }[]
+}>(), {
+  heading: 'Add clear photos',
+  hint: 'Include the whole device, any damage, and the battery compartment if visible.',
+  savedPhotos: () => [],
+})
 
 const emit = defineEmits<{
   add: [files: File[]]
   remove: [index: number]
+  'remove-saved': [index: number]
 }>()
+
+const hasPhotos = computed(() => props.files.length > 0 || props.savedPhotos.length > 0)
 
 const sheetOpen = ref(false)
 const cameraOpen = ref(false)
@@ -145,11 +155,10 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
-      Add clear
-      <span class="font-serif font-medium italic">photos</span>
+      {{ props.heading }}
     </h2>
     <p class="mt-1.5 text-sm text-muted-foreground">
-      Include the whole device, any damage, and the battery compartment if visible.
+      {{ props.hint }}
     </p>
 
     <div class="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
@@ -161,6 +170,22 @@ onBeforeUnmount(() => {
         <ImagePlus class="size-6" />
         <span class="text-[10px] font-medium sm:text-xs">Add</span>
       </button>
+
+      <div
+        v-for="(photo, index) in props.savedPhotos"
+        :key="photo.id"
+        class="relative aspect-square overflow-hidden rounded-2xl bg-neutral-200"
+      >
+        <img :src="photo.url" alt="" class="size-full object-cover">
+        <button
+          type="button"
+          class="absolute top-1.5 right-1.5 flex size-7 items-center justify-center rounded-full bg-foreground/80 text-white"
+          aria-label="Remove saved photo"
+          @click="emit('remove-saved', index)"
+        >
+          <X class="size-3.5" />
+        </button>
+      </div>
 
       <div
         v-for="(preview, index) in props.previews"
@@ -188,7 +213,7 @@ onBeforeUnmount(() => {
       @change="onPick"
     >
 
-    <p v-if="props.files.length === 0" class="mt-3 text-xs text-muted-foreground">
+    <p v-if="!hasPhotos" class="mt-3 text-xs text-muted-foreground">
       At least one photo is required.
     </p>
 
