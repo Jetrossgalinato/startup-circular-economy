@@ -53,6 +53,7 @@ export type DiyProduct = {
   created_at: string
   updated_at: string
   diy_product_photos?: DiyProductPhoto[]
+  has_orders?: boolean
 }
 
 export type DiyCartItem = {
