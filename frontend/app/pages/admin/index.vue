@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronRight } from '@lucide/vue'
 import type { AdminOpsSummary } from '@/composables/useAdminListings'
 import type { RateCardCategory } from '@/types/listings'
 
@@ -88,41 +89,57 @@ watch(rateCardTick, () => {
 
     <NuxtLink
       to="/admin/claims"
-      class="block rounded-[1.5rem] bg-[#ead9c4] p-4 transition hover:opacity-90"
+      class="flex items-start justify-between gap-3 rounded-[1.5rem] bg-[#ead9c4] p-4 transition hover:opacity-90 active:opacity-80"
     >
-      <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
-        CLAIMS
-      </p>
-      <p class="mt-1 text-3xl font-bold tracking-tight">
-        {{ unreadClaims }}
-      </p>
-      <p class="mt-0.5 text-sm text-foreground/70">
-        Unseen collector claims
-      </p>
+      <div>
+        <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
+          CLAIMS
+        </p>
+        <p class="mt-1 text-3xl font-bold tracking-tight">
+          {{ unreadClaims }}
+        </p>
+        <p class="mt-0.5 text-sm text-foreground/70">
+          Unseen collector claims
+        </p>
+      </div>
+      <ChevronRight class="mt-0.5 size-5 shrink-0 text-foreground/40" />
     </NuxtLink>
     
+    <DiyTeaserCard
+      to="/admin/market"
+      kicker="DIY MARKET"
+      title="Review listings"
+      body="Approve collector upcycles and oversee resident orders."
+    />
+
     <div class="grid grid-cols-2 gap-3">
       <NuxtLink
         to="/admin/activity"
-        class="rounded-[1.5rem] bg-[#dce8ee] p-4 transition hover:opacity-90"
+        class="flex items-start justify-between gap-3 rounded-[1.5rem] bg-[#dce8ee] p-4 transition hover:opacity-90 active:opacity-80"
       >
-        <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
-          ACTIVITY
-        </p>
-        <p class="mt-1 text-lg font-bold tracking-tight">
-          All listings
-        </p>
+        <div>
+          <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
+            ACTIVITY
+          </p>
+          <p class="mt-1 text-lg font-bold tracking-tight">
+            All listings
+          </p>
+        </div>
+        <ChevronRight class="mt-0.5 size-5 shrink-0 text-foreground/40" />
       </NuxtLink>
       <NuxtLink
         to="/admin/rates"
-        class="rounded-[1.5rem] bg-[#ead9c4] p-4 transition hover:opacity-90"
+        class="flex items-start justify-between gap-3 rounded-[1.5rem] bg-[#ead9c4] p-4 transition hover:opacity-90 active:opacity-80"
       >
-        <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
-          RATES
-        </p>
-        <p class="mt-1 text-lg font-bold tracking-tight">
-          Edit ₱/kg
-        </p>
+        <div>
+          <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
+            RATES
+          </p>
+          <p class="mt-1 text-lg font-bold tracking-tight">
+            Edit ₱/kg
+          </p>
+        </div>
+        <ChevronRight class="mt-0.5 size-5 shrink-0 text-foreground/40" />
       </NuxtLink>
     </div>
 
