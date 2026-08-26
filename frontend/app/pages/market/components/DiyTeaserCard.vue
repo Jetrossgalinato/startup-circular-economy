@@ -12,7 +12,7 @@ defineProps<{
 <template>
   <NuxtLink
     :to="to"
-    class="flex items-start justify-between gap-3 rounded-[1.5rem] bg-[#ead9c4] p-4 transition hover:opacity-90 active:opacity-80"
+    class="flex items-start justify-between gap-3 rounded-[1.5rem] bg-[#e4e0ee] p-4 transition hover:opacity-90 active:opacity-80"
   >
     <div>
       <p class="text-[10px] font-semibold tracking-[0.16em] text-foreground/50">
