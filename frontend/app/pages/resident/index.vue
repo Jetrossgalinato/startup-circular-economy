@@ -59,13 +59,6 @@ watch(rateCardTick, () => {
       :active-count="activeCount"
       :recent="recent"
     />
-    <DiyTeaserCard
-      class="mt-6"
-      to="/resident/market"
-      kicker="DIY MARKET"
-      title="Upcycled e-waste"
-      body="Browse collector-made pieces. Pay with GCash or cash."
-    />
     <RateCardTeaser v-if="categories.length" :categories="categories" />
     <p v-else-if="!loading" class="mt-8 text-sm text-muted-foreground">
       Rate card will appear once categories are available.
