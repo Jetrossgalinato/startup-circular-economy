@@ -1,6 +1,8 @@
 # E-WISE user manual
 
-E-WISE is a Butuan-focused e-waste platform. **Residents sell to the company**, the **cross-dock (admin)** weighs and pays, and **collectors claim company stock**. Collectors never go to a resident’s home.
+E-WISE is a Butuan-focused e-waste platform. **Residents sell to the company**, the **cross-dock (admin)** weighs and pays, and **collectors claim company stock**. Collectors never go to a resident’s home for sell/claims.
+
+**DIY Market** is a separate channel: collectors list upcycled pieces made from e-waste, admin reviews them, and residents buy them with GCash or cash.
 
 ---
 
@@ -8,9 +10,9 @@ E-WISE is a Butuan-focused e-waste platform. **Residents sell to the company**, 
 
 1. Open the landing page and choose **Log in** or **Register**.
 2. On register, enter name, email, password, and a **role**:
-   - **Resident** — sell household e-waste
-   - **Admin** — cross-dock intake, payouts, claims, rates
-   - **Collector** — claim paid company stock
+   - **Resident** — sell household e-waste; buy DIY upcycled goods
+   - **Admin** — cross-dock intake, payouts, claims, rates; review DIY listings
+   - **Collector** — claim paid company stock; sell DIY upcycled goods
 3. After login you land on that role’s home. The header shows your role (RESIDENT / ADMIN / COLLECTOR).
 4. Use the bottom nav for the main screens. **Profile** is where you log out.
 
@@ -20,13 +22,14 @@ Use a real email and password you can remember. Each account has one role.
 
 ## 2. Resident
 
-**Nav:** Home · Sell · Activity · Profile
+**Nav:** Home · Sell · Activity · Market · Profile
 
 ### Home
 
 - Greeting and count of **active** listings (not paid, refused, or cancelled)
 - Recent listings
 - Published **₱/kg rate card** teaser
+- DIY Market is **not** on Home — open it from the **Market** tab
 
 ### Sell (6 steps)
 
@@ -71,13 +74,15 @@ Typical path:
 
 ## 3. Admin (cross-dock)
 
-**Nav:** Home · Intake · Claims · Activity · Profile
+**Nav:** Home · Intake · Activity · Market · Profile
+
+**Claims** is a Home shortcut, not a bottom-nav item. **Rates** is also opened from Home.
 
 ### Home
 
 - Counts: scheduled pickups, weighed, paid today
 - Unseen **collector claims**
-- Shortcuts to intake, all listings, **edit ₱/kg**
+- Shortcuts to intake, all listings, **edit ₱/kg**, and **DIY Market** review
 
 ### Intake
 
@@ -124,7 +129,7 @@ When a collector claims stock:
 
 ## 4. Collector
 
-**Nav:** Home · Browse · Orders · Profile
+**Nav:** Home · Browse · Orders · Market · Profile
 
 Collectors only see **company stock** that is **paid** and resale-eligible. No resident names or home addresses.
 
@@ -133,6 +138,7 @@ Collectors only see **company stock** that is **paid** and resale-eligible. No r
 - **Available** vs **claimed** counts
 - Preview of stock
 - Pickup vs delivery reminder
+- Shortcut card into **DIY Market**
 
 ### Browse
 
@@ -159,7 +165,8 @@ Status:
 
 ### Profile
 
-- Phone and address **required for delivery**
+- Phone and address **required for delivery** (company stock) and for DIY pickup/delivery
+- **GCash number** required to submit DIY listings
 - Log out
 
 ---
@@ -179,7 +186,7 @@ Status:
 
 - **Quote** = category ₱/kg (rate card).
 - **Final payout** = **weight × rate**, set at intake.
-- Resident chooses **GCash** or **cash**. The app records **status**, not a bank transfer.
+- Resident chooses **GCash** or **cash** for sell payouts and for DIY checkout. The app records **status**, not a bank transfer.
 
 ---
 
@@ -201,7 +208,11 @@ Resident → E-WISE (admin/cross-dock) → Collector
 
 Products must be **made from e-waste**. Admin approves listings before residents can buy. Checkout is **one product at a time**. Cart only saves items. There is no payment gateway — GCash numbers are shown in-app.
 
+**Stock** is deducted only when the collector taps **Mark paid**. An unpaid order does not take the piece off the shop.
+
 ### Resident
+
+Tabs: **Shop** · **Cart** · **My orders**
 
 - Browse live pieces, filter by category
 - **Add to cart** or **Buy now**
@@ -211,11 +222,20 @@ Products must be **made from e-waste**. Admin approves listings before residents
 
 ### Collector
 
-- Add GCash, phone, and address on **Profile**
-- **Sell** a piece (photos, details, e-waste source, price, stock) → waits for admin
-- Incoming DIY orders: **Mark paid**, then **Ready for pickup** or **Out for delivery**, or **Reject** while unpaid
+Tabs: **Shop** · **Sell** · **My listings** · **Orders**
+
+- Add GCash, phone, and address on **Profile** before submitting
+- **Sell** a piece (photos, details, e-waste source, price, stock) → **Pending review**
+- You can **continue a draft** (saved photos stay on the photo step)
+- **My listings:**
+  - **Unpublish** live or pending-review pieces (they leave the shop)
+  - **Remove** drafts, rejected, or hidden pieces that have **no orders**
+  - Listings that already have orders **cannot be deleted** (they stay as Hidden / history)
+- Incoming DIY orders: **Mark paid** (this sells the stock), then **Ready for pickup** or **Out for delivery**, or **Reject** while unpaid
 
 ### Admin
+
+Tabs: **Review** · **Catalog** · **Orders**
 
 - **Review** queue: approve or reject (optional reason)
 - **Catalog:** hide a live listing
@@ -227,5 +247,5 @@ Products must be **made from e-waste**. Admin approves listings before residents
 
 - **Photos:** at least one; camera or gallery; allow camera on PC.
 - **Filters:** Activity chips only show statuses/categories you already have.
-- **Realtime:** new claims, intake, chat, and order updates appear without refresh if you are logged in.
+- **Realtime:** new claims, intake, chat, DIY listings, and order updates appear without refresh if you are logged in.
 - **Device mode in Chrome/Firefox** still uses the **PC webcam**, not a phone camera.
