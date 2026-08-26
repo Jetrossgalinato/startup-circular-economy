@@ -56,9 +56,13 @@ async function copyGcash() {
   if (!gcashNumber.value) return
   try {
     await navigator.clipboard.writeText(gcashNumber.value)
-    toast.success('GCash number copied')
+    toast.success('GCash number copied', {
+      description: 'Paste it in GCash to send the payment.',
+    })
   } catch {
-    toast.error('Could not copy')
+    toast.error('Could not copy', {
+      description: 'Select the number and copy it manually.',
+    })
   }
 }
 

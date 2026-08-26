@@ -151,7 +151,9 @@ async function goNext() {
       await persistDraft()
       if (!productId.value) return
       const submitted = await submitProduct(productId.value)
-      toast.success('Submitted for review')
+      toast.success('Submitted for review', {
+        description: 'An admin will approve it before residents can buy.',
+      })
       emit('submitted', submitted)
       return
     }

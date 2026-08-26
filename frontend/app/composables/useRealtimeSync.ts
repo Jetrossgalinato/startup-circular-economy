@@ -126,7 +126,9 @@ export function useRealtimeSync() {
       && next?.status === 'pending_review'
       && prev?.status !== 'pending_review'
     ) {
-      toast.success('New DIY listing to review')
+      toast.success('New DIY listing to review', {
+        description: 'Open Market to approve or reject it.',
+      })
     }
     if (
       profile.value?.role === 'collector'
@@ -135,7 +137,9 @@ export function useRealtimeSync() {
       && next?.status === 'active'
       && prev?.status !== 'active'
     ) {
-      toast.success('Your DIY listing is live')
+      toast.success('Your DIY listing is live', {
+        description: 'Residents can now buy this piece in the market.',
+      })
     }
   }
 
@@ -151,18 +155,26 @@ export function useRealtimeSync() {
 
     if (profile.value?.role === 'collector' && next.collector_id === user.value.id) {
       if (payload.eventType === 'INSERT') {
-        toast.success('New DIY order')
+        toast.success('New DIY order', {
+          description: 'Open Market orders to mark paid or reject it.',
+        })
       }
     }
     if (profile.value?.role === 'resident' && next.resident_id === user.value.id) {
       if (next.status === 'paid' && prev?.status !== 'paid') {
-        toast.success('Collector marked your DIY order paid')
+        toast.success('Payment confirmed', {
+          description: 'The collector marked your DIY order as paid.',
+        })
       }
       if (next.status === 'ready' && prev?.status !== 'ready') {
-        toast.success('Your DIY order is ready for pickup')
+        toast.success('Ready for pickup', {
+          description: 'Your DIY order is ready at the collector’s address.',
+        })
       }
       if (next.status === 'out_for_delivery' && prev?.status !== 'out_for_delivery') {
-        toast.success('Your DIY order is out for delivery')
+        toast.success('Out for delivery', {
+          description: 'The collector is delivering your DIY order.',
+        })
       }
     }
   }

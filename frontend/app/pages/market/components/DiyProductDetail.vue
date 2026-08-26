@@ -25,7 +25,9 @@ const photos = computed(() => props.product.diy_product_photos ?? [])
 async function saveToCart() {
   try {
     await addToCart(props.product)
-    toast.success('Saved to cart')
+    toast.success('Saved to cart', {
+      description: 'Open Cart to place this order when you are ready.',
+    })
   } catch (error) {
     toast.error('Could not add to cart', {
       description: error instanceof Error ? error.message : 'Try again.',
@@ -33,12 +35,12 @@ async function saveToCart() {
   }
 }
 
-async function run(action: () => Promise<unknown>, success: string) {
+async function run(action: () => Promise<unknown>, success: string, description: string) {
   if (busy.value) return
   busy.value = true
   try {
     await action()
-    toast.success(success)
+    toast.success(success, { description })
   } catch (error) {
     toast.error('Could not update', {
       description: error instanceof Error ? error.message : 'Try again.',
@@ -117,7 +119,7 @@ async function run(action: () => Promise<unknown>, success: string) {
         variant="outline"
         class="h-11 w-full rounded-full"
         :disabled="busy"
-        @click="run(() => hideProduct(product.id), 'Listing hidden')"
+        @click="run(() => hideProduct(product.id), 'Listing hidden', 'This piece is no longer in the market.')"
       >
         Unpublish
       </Button>
@@ -128,7 +130,7 @@ async function run(action: () => Promise<unknown>, success: string) {
         <Button
           class="h-11 w-full rounded-full bg-foreground text-white hover:bg-foreground/90"
           :disabled="busy"
-          @click="run(() => approveProduct(product.id), 'Listing is live')"
+          @click="run(() => approveProduct(product.id), 'Listing is live', 'Residents can now buy this piece.')"
         >
           Approve
         </Button>
@@ -143,7 +145,7 @@ async function run(action: () => Promise<unknown>, success: string) {
           variant="outline"
           class="h-11 w-full rounded-full"
           :disabled="busy"
-          @click="run(() => rejectProduct(product.id, rejectReason), 'Listing rejected')"
+          @click="run(() => rejectProduct(product.id, rejectReason), 'Listing rejected', 'The collector can edit and submit it again.')"
         >
           Reject
         </Button>
@@ -154,7 +156,7 @@ async function run(action: () => Promise<unknown>, success: string) {
         variant="outline"
         class="h-11 w-full rounded-full"
         :disabled="busy"
-        @click="run(() => hideProduct(product.id), 'Listing hidden')"
+        @click="run(() => hideProduct(product.id), 'Listing hidden', 'This piece is no longer in the market.')"
       >
         Hide listing
       </Button>

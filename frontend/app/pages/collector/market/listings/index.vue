@@ -52,10 +52,14 @@ async function confirmRemove() {
   try {
     if (hardDelete) {
       await deleteProduct(product.id)
-      toast.success('Listing removed')
+      toast.success('Listing removed', {
+        description: 'This piece is gone from My listings.',
+      })
     } else {
       await hideProduct(product.id)
-      toast.success('Listing unpublished')
+      toast.success('Listing unpublished', {
+        description: 'It is hidden from the market until you list it again.',
+      })
     }
     dialogOpen.value = false
     pendingProduct.value = null

@@ -13,12 +13,12 @@ const { cancelOrder, rejectOrder, markPaid, fulfillOrder, completeOrder } = useD
 const busy = ref(false)
 const rejectReason = ref('')
 
-async function run(action: () => Promise<unknown>, success: string) {
+async function run(action: () => Promise<unknown>, success: string, description: string) {
   if (busy.value) return
   busy.value = true
   try {
     await action()
-    toast.success(success)
+    toast.success(success, { description })
   } catch (error) {
     toast.error('Could not update order', {
       description: error instanceof Error ? error.message : 'Try again.',
@@ -33,9 +33,13 @@ async function copyGcash() {
   if (!number) return
   try {
     await navigator.clipboard.writeText(number)
-    toast.success('GCash number copied')
+    toast.success('GCash number copied', {
+      description: 'Paste it in GCash to send the payment.',
+    })
   } catch {
-    toast.error('Could not copy')
+    toast.error('Could not copy', {
+      description: 'Select the number and copy it manually.',
+    })
   }
 }
 </script>
@@ -108,7 +112,7 @@ async function copyGcash() {
         variant="outline"
         class="h-11 w-full rounded-full"
         :disabled="busy"
-        @click="run(() => cancelOrder(order.id), 'Order cancelled')"
+        @click="run(() => cancelOrder(order.id), 'Order cancelled', 'The collector will not fulfill this order.')"
       >
         Cancel order
       </Button>
@@ -116,7 +120,7 @@ async function copyGcash() {
         v-if="order.status === 'ready' || order.status === 'out_for_delivery'"
         class="h-11 w-full rounded-full bg-foreground text-white hover:bg-foreground/90"
         :disabled="busy"
-        @click="run(() => completeOrder(order.id), 'Marked received')"
+        @click="run(() => completeOrder(order.id), 'Marked received', 'This order is complete.')"
       >
         Mark received
       </Button>
@@ -127,7 +131,7 @@ async function copyGcash() {
         v-if="order.status === 'pending_payment'"
         class="h-11 w-full rounded-full bg-foreground text-white hover:bg-foreground/90"
         :disabled="busy"
-        @click="run(() => markPaid(order.id), 'Payment recorded')"
+        @click="run(() => markPaid(order.id), 'Payment recorded', 'Stock is now sold. Fulfill pickup or delivery next.')"
       >
         Mark paid
       </Button>
@@ -135,7 +139,7 @@ async function copyGcash() {
         v-if="order.status === 'paid'"
         class="h-11 w-full rounded-full bg-foreground text-white hover:bg-foreground/90"
         :disabled="busy"
-        @click="run(() => fulfillOrder(order.id), order.fulfillment_method === 'delivery' ? 'Out for delivery' : 'Ready for pickup')"
+        @click="run(() => fulfillOrder(order.id), order.fulfillment_method === 'delivery' ? 'Out for delivery' : 'Ready for pickup', order.fulfillment_method === 'delivery' ? 'The resident can track this as out for delivery.' : 'The resident can pick this up from your address.')"
       >
         {{ order.fulfillment_method === 'delivery' ? 'Out for delivery' : 'Ready for pickup' }}
       </Button>
@@ -150,7 +154,7 @@ async function copyGcash() {
           variant="outline"
           class="h-11 w-full rounded-full"
           :disabled="busy"
-          @click="run(() => rejectOrder(order.id, rejectReason), 'Order rejected')"
+          @click="run(() => rejectOrder(order.id, rejectReason), 'Order rejected', 'The resident will see this order as rejected.')"
         >
           Reject order
         </Button>
