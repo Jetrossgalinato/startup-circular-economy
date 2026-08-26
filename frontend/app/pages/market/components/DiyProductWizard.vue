@@ -2,7 +2,7 @@
 import { toast } from 'vue-sonner'
 import { AUTH_INPUT_CLASS } from '@/constants/auth'
 import { DIY_CATEGORIES, DIY_MAX_PHOTOS } from '@/constants/diy'
-import type { DiyCategory, DiyProduct } from '@/types/diy'
+import type { DiyCategory, DiyProduct, DiyProductPhoto } from '@/types/diy'
 
 const props = defineProps<{
   product?: DiyProduct | null
@@ -18,12 +18,27 @@ const step = computed(() => steps[stepIndex.value])
 
 const { profile } = useAuth()
 const { createDraft, updateProduct, submitProduct } = useDiyProducts()
-const { uploadPhotos } = useDiyUpload()
+const { uploadPhotos, getSignedUrls, removePhoto } = useDiyUpload()
 
 const productId = ref(props.product?.id ?? null)
 const files = ref<File[]>([])
 const previews = ref<string[]>([])
-const existingCount = computed(() => props.product?.diy_product_photos?.length ?? 0)
+const savedPhotos = ref<DiyProductPhoto[]>(props.product?.diy_product_photos ?? [])
+const existingCount = computed(() => savedPhotos.value.length)
+const savedPhotoItems = computed(() =>
+  savedPhotos.value
+    .filter((photo) => photo.signed_url)
+    .map((photo) => ({ id: photo.id, url: photo.signed_url as string })),
+)
+
+watch(
+  () => props.product,
+  (next) => {
+    if (!next) return
+    productId.value = next.id
+    savedPhotos.value = next.diy_product_photos ?? []
+  },
+)
 
 const title = ref(props.product?.title ?? '')
 const description = ref(props.product?.description ?? '')
@@ -49,6 +64,34 @@ function removeFile(index: number) {
   if (preview) URL.revokeObjectURL(preview)
   files.value = files.value.filter((_, i) => i !== index)
   previews.value = previews.value.filter((_, i) => i !== index)
+}
+
+async function removeSavedPhoto(index: number) {
+  const item = savedPhotoItems.value[index]
+  const photo = savedPhotos.value.find((entry) => entry.id === item?.id)
+  if (!photo) return
+  try {
+    await removePhoto(photo)
+    savedPhotos.value = savedPhotos.value.filter((entry) => entry.id !== photo.id)
+  } catch (error) {
+    toast.error('Could not remove photo', {
+      description: error instanceof Error ? error.message : 'Try again.',
+    })
+  }
+}
+
+function clearLocalPhotos() {
+  files.value = []
+  previews.value.forEach((url) => URL.revokeObjectURL(url))
+  previews.value = []
+}
+
+async function attachNewPhotos(id: string) {
+  if (files.value.length === 0) return
+  const uploaded = await uploadPhotos(id, files.value)
+  const withUrls = await getSignedUrls(uploaded)
+  savedPhotos.value = [...savedPhotos.value, ...withUrls]
+  clearLocalPhotos()
 }
 
 const canContinue = computed(() => {
@@ -82,22 +125,12 @@ async function persistDraft() {
   if (!productId.value) {
     const created = await createDraft(payload)
     productId.value = created.id
-    if (files.value.length) {
-      await uploadPhotos(created.id, files.value)
-      files.value = []
-      previews.value.forEach((url) => URL.revokeObjectURL(url))
-      previews.value = []
-    }
+    await attachNewPhotos(created.id)
     return created
   }
 
   const updated = await updateProduct(productId.value, payload)
-  if (files.value.length) {
-    await uploadPhotos(productId.value, files.value)
-    files.value = []
-    previews.value.forEach((url) => URL.revokeObjectURL(url))
-    previews.value = []
-  }
+  await attachNewPhotos(productId.value)
   return updated
 }
 
@@ -105,7 +138,7 @@ async function goNext() {
   if (!canContinue.value || saving.value) return
   saving.value = true
   try {
-    if (step.value === 'photos' && files.value.length && !productId.value) {
+    if (step.value === 'photos' && files.value.length) {
       await persistDraft()
     }
     if (step.value === 'pricing') {
@@ -153,10 +186,12 @@ async function goNext() {
       v-if="step === 'photos'"
       :files="files"
       :previews="previews"
+      :saved-photos="savedPhotoItems"
       heading="Show the finished piece"
       hint="At least one photo of the upcycled product. Made from e-waste only."
       @add="addFiles"
       @remove="removeFile"
+      @remove-saved="removeSavedPhoto"
     />
 
     <div v-else-if="step === 'details'" class="space-y-4">

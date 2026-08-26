@@ -283,6 +283,19 @@ export function useDiyProducts() {
     return callProductRpc('hide_diy_product', { p_product_id: id })
   }
 
+  async function deleteProduct(id: string) {
+    const { error } = await supabase
+      .from('diy_products')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    invalidateProducts()
+  }
+
   return {
     peekCatalog,
     peekMyListings,
@@ -298,6 +311,7 @@ export function useDiyProducts() {
     approveProduct,
     rejectProduct,
     hideProduct,
+    deleteProduct,
     invalidateProducts,
   }
 }
